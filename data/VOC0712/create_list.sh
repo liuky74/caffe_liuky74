@@ -1,6 +1,6 @@
 #!/bin/bash
-
-root_dir=$HOME/data/VOCdevkit/
+cur_dir=$(cd $( dirname ${BASH_SOURCE[0]} ) && pwd )
+root_dir=$cur_dir/../../data/VOCdevkit
 sub_dir=ImageSets/Main
 bash_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 for dataset in trainval test

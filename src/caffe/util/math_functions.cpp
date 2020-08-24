@@ -244,9 +244,17 @@ template
 double caffe_nextafter(const double b);
 
 template <typename Dtype>
-void caffe_rng_uniform(const int n, const Dtype a, const Dtype b, Dtype* r) {
+void caffe_rng_uniform(const int n, const Dtype a, Dtype b, Dtype* r) {
   CHECK_GE(n, 0);
   CHECK(r);
+    if (a > b) {
+        if ((b<0) and (b>-1e-6)){
+            b = -b;
+
+        } else
+            fprintf(stderr,"ERR: caffe_rng_uniform check a<=b get wrong\n");
+
+    }
   CHECK_LE(a, b);
   boost::uniform_real<Dtype> random_distribution(a, caffe_nextafter<Dtype>(b));
   boost::variate_generator<caffe::rng_t*, boost::uniform_real<Dtype> >

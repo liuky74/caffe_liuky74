@@ -437,7 +437,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: recurrent_param)
+// LayerParameter next available layer-specific ID: 148 (last added: annotated_matrix_data_layer)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -542,6 +542,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
+  optional AnnotatedMatrixDataParameter annotated_matrix_data_param = 147;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1918,4 +1919,14 @@ message PReLUParameter {
   optional FillerParameter filler = 1;
   // Whether or not slope paramters are shared across channels.
   optional bool channel_shared = 2 [default = false];
+}
+
+message AnnotatedMatrixDataParameter{
+  // Define the sampler.
+  repeated BatchSampler batch_sampler = 1;
+  // Store label name and label id in LabelMap format.
+  optional string label_map_file = 2;
+  // If provided, it will replace the AnnotationType stored in each
+  // AnnotatedDatum.
+  optional AnnotatedDatum.AnnotationType anno_type = 3;
 }

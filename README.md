@@ -67,7 +67,7 @@ Please cite SSD in your publications if it helps your research:
 ### Preparation
 1. Download [fully convolutional reduced (atrous) VGGNet](https://gist.github.com/weiliu89/2ed6e13bfd5b57cf81d6). By default, we assume the model is stored in `$CAFFE_ROOT/models/VGGNet/`
 
-2. Download VOC2007 and VOC2012 dataset. By default, we assume the data is stored in `$HOME/data/`
+2. Download VOC2007 and VOC2012 dataset. By default, we assume the data is stored in `$caffe/data/`
   ```Shell
   # Download the data.
   cd $HOME/data
