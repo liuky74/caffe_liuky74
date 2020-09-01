@@ -24,7 +24,7 @@ namespace caffe {
 template <typename Dtype>
 Net<Dtype>::Net(const NetParameter& param, const Net* root_net)
     : root_net_(root_net) {
-  Init(param);
+  Init(param);/*参数初始化,加载模型结构*/
 }
 
 template <typename Dtype>
@@ -46,7 +46,7 @@ Net<Dtype>::Net(const string& param_file, Phase phase,
 }
 
 template <typename Dtype>
-void Net<Dtype>::Init(const NetParameter& in_param) {
+void Net<Dtype>::Init(const NetParameter& in_param) {/*网络初始化,*/
   CHECK(Caffe::root_solver() || root_net_)
       << "root_net_ needs to be set for all non-root solvers";
   // Set phase from the state.

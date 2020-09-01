@@ -68,17 +68,17 @@ class BasePrefetchingDataLayer :
       const vector<Blob<Dtype>*>& top);
 
   // Prefetches batches (asynchronously if to GPU memory)
-  static const int PREFETCH_COUNT = 3;
+  static const int PREFETCH_COUNT = 3;/*缓存(预取)数量*/
 
  protected:
   virtual void InternalThreadEntry();
   virtual void load_batch(Batch<Dtype>* batch) = 0;
 
-  Batch<Dtype> prefetch_[PREFETCH_COUNT];
-  BlockingQueue<Batch<Dtype>*> prefetch_free_;
-  BlockingQueue<Batch<Dtype>*> prefetch_full_;
+  Batch<Dtype> prefetch_[PREFETCH_COUNT];/*预存数据用的buff数组,Batch包含一个data blob和一个label blob,即一个完整的数据*/
+  BlockingQueue<Batch<Dtype>*> prefetch_free_;/*从free队列取出可用空间的内存地址,填充数据进入内存后放入full队列*/
+  BlockingQueue<Batch<Dtype>*> prefetch_full_;/*从full队列取出存有数据的内存地址,正常使用后重新作为可用空间存入free队列*/
 
-  Blob<Dtype> transformed_data_;
+  Blob<Dtype> transformed_data_;/*当需要做图片预处理时储存处理后的图片*/
 };
 
 }  // namespace caffe

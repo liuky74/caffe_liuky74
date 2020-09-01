@@ -69,7 +69,7 @@ class SolverRegistry {
     registry[type] = creator;
   }
 
-  // Get a solver using a SolverParameter.
+  // 通过静态函数获得解算器类进行初始化,初始化过程中会读取各个参数,读取网络文件等.Get a solver using a SolverParameter.
   static Solver<Dtype>* CreateSolver(const SolverParameter& param) {
     const string& type = param.type();
     printf("%s",&type[0]);
@@ -120,7 +120,7 @@ class SolverRegisterer {
   }
 };
 
-/*注册宏,在各个解算器层定义会调用这个宏进行注册*/
+/*注册宏,在各个解算器层定义会调用这个宏生成当前层的注册类进行注册(写入注册类维护的一个全局解算器表)*/
 #define REGISTER_SOLVER_CREATOR(type, creator)                                 \
   static SolverRegisterer<float> g_creator_f_##type(#type, creator<float>);    \
   static SolverRegisterer<double> g_creator_d_##type(#type, creator<double>)   \

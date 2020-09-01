@@ -31,22 +31,27 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
    * 这里调出了读取器中的full队列,并且通过peek获取了队列头*/
   Datum& datum = *(reader_.full().peek());
 
-  // Use data_transformer to infer the expected blob shape from datum.
+  /* 使用data_transformer 根据datum内的参数计算top blob的shape
+   * InferBlobShape获得的是一个4dim的shape,其中由于datum一次只取一张图片所以top_shape[0]=1*/
   vector<int> top_shape = this->data_transformer_->InferBlobShape(datum);
-  this->transformed_data_.Reshape(top_shape);
+  printf("shape:[%i,%i,%i,%i]",top_shape[0],top_shape[1],top_shape[2],top_shape[3]);
+  fflush(stdout);
+  this->transformed_data_.Reshape(top_shape);/*将存储预处理数据的blob调整为top shape*/
   // Reshape top[0] and prefetch_data according to the batch_size.
-  top_shape[0] = batch_size;
-  top[0]->Reshape(top_shape);
+  top_shape[0] = batch_size;/*写入batch size*/
+  top[0]->Reshape(top_shape);/*DataLayer固定只有2个输出blob(data与label),先对data blob进行reshape*/
+  /*将预读数组中的data blob全部reshape,注意数组中的blob是内存复用的,所以只需要reshape一次*/
   for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
     this->prefetch_[i].data_.Reshape(top_shape);
   }
   LOG(INFO) << "output data size: " << top[0]->num() << ","
       << top[0]->channels() << "," << top[0]->height() << ","
       << top[0]->width();
-  // label
+  // 同样对label blob进行reshape
   if (this->output_labels_) {
-    vector<int> label_shape(1, batch_size);
+    vector<int> label_shape(1, batch_size);/*注意这里的维度是[cls,batch_size],和常见的相反,而且没有进行one hot*/
     top[1]->Reshape(label_shape);
+    /*将预读数组中的label blob全部reshape,注意数组中的blob是内存复用的,所以只需要reshape一次*/
     for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
       this->prefetch_[i].label_.Reshape(label_shape);
     }

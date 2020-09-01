@@ -282,6 +282,10 @@ int train() {
             GetRequestedAction(FLAGS_sighup_effect));
     /* 将定义好的参数传入solver类,创建solver解算器对象并使用智能指针进行包装
      * 注意CreateSolver(solver_param)函数已经初始化了解算器
+     * 初始化流程:
+     *   所有解算器都会调用父类solver的构造函数,同时还会调用preSolver函数进行预处理
+     *   父类solver的构造函数会加载solver文件中的参数进行solver初始化
+     *   在solver初始化的过程中会调用Net的init函数对网络结构进行初始化
      * */
     shared_ptr<caffe::Solver<float>> solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
 
@@ -300,13 +304,13 @@ int train() {
         CopyLayers(solver.get(), FLAGS_weights);
     }
 
-    /*对于多个GPU方式,用线程并行优化网络*/
-    if (gpus.size() > 1) {
+    /*运行解算器开始迭代训练/测试模型*/
+    if (gpus.size() > 1) {/*针对多GPU进行优化*/
         caffe::P2PSync<float> sync(solver, NULL, solver->param());
-        sync.Run(gpus);
+        sync.Run(gpus);/*执行解算器(迭代训练/测试)*/
     } else {
         LOG(INFO) << "Starting Optimization";
-        solver->Solve();
+        solver->Solve();/*Starting Optimization 执行解算器(迭代训练/测试)*/
     }
     LOG(INFO) << "Optimization Done.";
     return 0;
