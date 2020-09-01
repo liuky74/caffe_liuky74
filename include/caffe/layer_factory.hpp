@@ -112,7 +112,7 @@ class LayerRegistry {
   }
 };
 
-
+/*网络层注册函数,各个网络层会在头文件中通过宏函数进行声明调用,从而将自身注册进全局网络层信息表中*/
 template <typename Dtype>
 class LayerRegisterer {
  public:
@@ -123,7 +123,7 @@ class LayerRegisterer {
   }
 };
 
-
+/*注册宏,在各个网络层会调用这个宏进行注册*/
 #define REGISTER_LAYER_CREATOR(type, creator)                                  \
   static LayerRegisterer<float> g_creator_f_##type(#type, creator<float>);     \
   static LayerRegisterer<double> g_creator_d_##type(#type, creator<double>)    \

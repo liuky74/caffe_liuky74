@@ -30,7 +30,7 @@
 #if defined(USE_LEVELDB) && defined(USE_LMDB)
 
 using namespace caffe;  // NOLINT(build/namespaces)
-using boost::scoped_ptr;
+using boost::scoped_ptr;/*boost的智能指针*/
 using std::string;
 
 DEFINE_string(backend, "lmdb", "The backend for storing the result");
@@ -53,34 +53,36 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   uint32_t num_labels;
   uint32_t rows;
   uint32_t cols;
-
+  /*文件的头4个byte为校对符*/
   image_file.read(reinterpret_cast<char*>(&magic), 4);
   magic = swap_endian(magic);
   CHECK_EQ(magic, 2051) << "Incorrect image file magic.";
   label_file.read(reinterpret_cast<char*>(&magic), 4);
   magic = swap_endian(magic);
   CHECK_EQ(magic, 2049) << "Incorrect label file magic.";
+  /*接下来4个byte为item数量*/
   image_file.read(reinterpret_cast<char*>(&num_items), 4);
-  num_items = swap_endian(num_items);
+  num_items = swap_endian(num_items);/*大小端转换*/
   label_file.read(reinterpret_cast<char*>(&num_labels), 4);
   num_labels = swap_endian(num_labels);
   CHECK_EQ(num_items, num_labels);
+  /*接下来8byte为图像的height(rows)和width(cols)*/
   image_file.read(reinterpret_cast<char*>(&rows), 4);
   rows = swap_endian(rows);
   image_file.read(reinterpret_cast<char*>(&cols), 4);
   cols = swap_endian(cols);
 
-
+/*新建一个database对象*/
   scoped_ptr<db::DB> db(db::GetDB(db_backend));
-  db->Open(db_path, db::NEW);
-  scoped_ptr<db::Transaction> txn(db->NewTransaction());
+  db->Open(db_path, db::NEW);/*新建lmdb文件*/
+  scoped_ptr<db::Transaction> txn(db->NewTransaction());/*交易操作类,将序列化的数据写入db中*/
 
   // Storing to db
   char label;
   char* pixels = new char[rows * cols];
   int count = 0;
   string value;
-
+  /*新建datum对象保存图像*/
   Datum datum;
   datum.set_channels(1);
   datum.set_height(rows);
@@ -88,15 +90,16 @@ void convert_dataset(const char* image_filename, const char* label_filename,
   LOG(INFO) << "A total of " << num_items << " items.";
   LOG(INFO) << "Rows: " << rows << " Cols: " << cols;
   for (int item_id = 0; item_id < num_items; ++item_id) {
-    image_file.read(pixels, rows * cols);
-    label_file.read(&label, 1);
-    datum.set_data(pixels, rows*cols);
-    datum.set_label(label);
-    string key_str = caffe::format_int(item_id, 8);
-    datum.SerializeToString(&value);
+    image_file.read(pixels, rows * cols);/*读取一张照片*/
+    label_file.read(&label, 1);/*读取一个标签*/
+    datum.set_data(pixels, rows*cols);/*将图片数据导入datum*/
+    datum.set_label(label);/*将标签导入datum*/
+    string key_str = caffe::format_int(item_id, 8);/*将整型转换为字符串作为索引键*/
 
-    txn->Put(key_str, value);
+    datum.SerializeToString(&value);/*将datum数据序列化为字符数据存入value中*/
 
+    txn->Put(key_str, value);/*将索引键与序列化的数据写入database*/
+    /*每1000个数据提交(写入)一次*/
     if (++count % 1000 == 0) {
       txn->Commit();
     }

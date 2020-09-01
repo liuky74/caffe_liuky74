@@ -16,10 +16,10 @@
 namespace caffe {
 
 template <typename Dtype>
-class AnnotatedMatrixDataLayer : public BasePrefetchingDataLayer<Dtype> {
+class AnnotatedDataLayer : public BasePrefetchingDataLayer<Dtype> {
  public:
-  explicit AnnotatedMatrixDataLayer(const LayerParameter& param);
-  virtual ~AnnotatedMatrixDataLayer();
+  explicit AnnotatedDataLayer(const LayerParameter& param);
+  virtual ~AnnotatedDataLayer();
   virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   // AnnotatedDataLayer uses DataReader instead for sharing for parallelism

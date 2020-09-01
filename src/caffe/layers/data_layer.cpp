@@ -27,6 +27,8 @@ void DataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
   const int batch_size = this->layer_param_.data_param().batch_size();
   // Read a data point, and use it to initialize the top blob.
+  /* 层对象中保存了一个数据读取器reader_,会从数据源获取数据存入队列中
+   * 这里调出了读取器中的full队列,并且通过peek获取了队列头*/
   Datum& datum = *(reader_.full().peek());
 
   // Use data_transformer to infer the expected blob shape from datum.

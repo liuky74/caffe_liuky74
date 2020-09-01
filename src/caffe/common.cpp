@@ -41,7 +41,7 @@ int64_t cluster_seedgen(void) {
 
 
 void GlobalInit(int* pargc, char*** pargv) {
-  // Google flags.
+  // Google flags.解析参数
   ::gflags::ParseCommandLineFlags(pargc, pargv, true);
   // Google logging.
   ::google::InitGoogleLogging(*(pargv)[0]);

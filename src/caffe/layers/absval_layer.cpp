@@ -39,6 +39,18 @@ STUB_GPU(AbsValLayer);
 #endif
 
 INSTANTIATE_CLASS(AbsValLayer);
+
+/*注册层,根据宏定义会声明如下变量:
+ * template <typename Dtype>
+ * shared_ptr<Layer<Dtype> > Creator_AbsValLayer(const LayerParameter& param)
+ * {
+ *      return shared_ptr<Layer<Dtype> >(new AbsValLayer<Dtype>(param));
+ * }
+ * static LayerRegisterer<float> g_creator_f_AbsVal("AbsVal", creator<float>);
+ * static LayerRegisterer<double> g_creator_d_AbsVal("AbsVal", creator<double>)
+ *
+ *
+ * */
 REGISTER_LAYER_CLASS(AbsVal);
 
 }  // namespace caffe

@@ -27,7 +27,7 @@ SolverAction::Enum Solver<Dtype>::GetRequestedAction() {
   }
   return SolverAction::NONE;
 }
-
+/*solver构造器会初始化一个net,回调函数,以及一个根solver解算器*/
 template <typename Dtype>
 Solver<Dtype>::Solver(const SolverParameter& param, const Solver* root_solver)
     : net_(), callbacks_(), root_solver_(root_solver),

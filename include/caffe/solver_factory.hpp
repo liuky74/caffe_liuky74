@@ -72,10 +72,12 @@ class SolverRegistry {
   // Get a solver using a SolverParameter.
   static Solver<Dtype>* CreateSolver(const SolverParameter& param) {
     const string& type = param.type();
-    CreatorRegistry& registry = Registry();
+    printf("%s",&type[0]);
+    fflush(stdout);
+    CreatorRegistry& registry = Registry();/*solver registry解算器注册类包含一个注册方法,会返回注册器工厂类*/
     CHECK_EQ(registry.count(type), 1) << "Unknown solver type: " << type
         << " (known types: " << SolverTypeListString() << ")";
-    return registry[type](param);
+    return registry[type](param);/*调用需要的解算器类传入参数初始化*/
   }
 
   static vector<string> SolverTypeList() {
@@ -118,7 +120,7 @@ class SolverRegisterer {
   }
 };
 
-
+/*注册宏,在各个解算器层定义会调用这个宏进行注册*/
 #define REGISTER_SOLVER_CREATOR(type, creator)                                 \
   static SolverRegisterer<float> g_creator_f_##type(#type, creator<float>);    \
   static SolverRegisterer<double> g_creator_d_##type(#type, creator<double>)   \
