@@ -1,20 +1,40 @@
+// syntax用来指定protobuf的版本
 syntax = "proto2";
-
+// package可以看作C++中的namespace，与Caffe C++代码中的namespace caffe对应
+// package用来避免名称冲突
 package caffe;
 
+/*
+在消息定义中，每个字段都有唯一的一个数字标识符。这些标识符是用来在消息的二进制格式中识别各个字段的，一旦开始使用就不能够再改变。
+注：[1,15]之内的标识号在编码的时候会占用一个字节。[16,2047]之内的标识号则占用2个字节。所以应该为那些频繁出现的消息元素保留 [1,15]之内的标识号。
+required：一个格式良好的消息一定要含有一个这种字段，表示该值是必须要设置的。
+optional：消息格式中该字段可以有0个或1个值（不超过1个）。
+repeated：在一个格式良好的消息中，这种字段可以重复任意多次（包括0次）。类型相当于std的vector，可以用来存放N个相同类型的内容
+*/
+
+
+
 // Specifies the shape (dimensions) of a Blob.
+// 指定Blob的shape，4-D shape
 message BlobShape {
+  //数据块形状定义为Num * Channel * Height * Wight, 原因在于caffe基于容器的多维嵌套来实现高维数据的封装, 即vector。
   repeated int64 dim = 1 [packed = true];
 }
 
+// Blob数据块，包括Blob shape，数据和差值
 message BlobProto {
+  // Blob的shape, 即numpy中的shape
   optional BlobShape shape = 7;
+  // 存放图像数据
   repeated float data = 5 [packed = true];
+  // 存放当前blob需要反向传播的差值
   repeated float diff = 6 [packed = true];
+  /*数据类型为64位浮点数时存放数据和差值的标识符*/
   repeated double double_data = 8 [packed = true];
   repeated double double_diff = 9 [packed = true];
 
   // 4D dimensions -- deprecated.  Use "shape" instead.
+  /*已被 BlobShape shape取代*/
   optional int32 num = 1 [default = 0];
   optional int32 channels = 2 [default = 0];
   optional int32 height = 3 [default = 0];
@@ -23,24 +43,29 @@ message BlobProto {
 
 // The BlobProtoVector is simply a way to pass multiple blobproto instances
 // around.
+/*BlobProto类型的数组,相当于vector<BlobProto>*/
 message BlobProtoVector {
   repeated BlobProto blobs = 1;
 }
-
+/*datum数据的标注格式*/
 message Datum {
   optional int32 channels = 1;
   optional int32 height = 2;
   optional int32 width = 3;
   // the actual image data, in bytes
+  // 实际的图像数据，以字节形式(uint8)表示
   optional bytes data = 4;
   optional int32 label = 5;
   // Optionally, the datum could also hold float data.
+  // 可选表示，图像数据表示为float数据，即0-255归一化到0-1之间
   repeated float float_data = 6;
   // If true data contains an encoded image that need to be decoded
+  /*图像数据是否经过编码(比如jpg编码)*/
   optional bool encoded = 7 [default = false];
 }
 
 // The label (display) name and label id.
+/*SSD专用数据,保存了分类名与整型之前的映射关系*/
 message LabelMapItem {
   // Both name and label are required.
   optional string name = 1;
@@ -48,18 +73,22 @@ message LabelMapItem {
   // display_name is optional.
   optional string display_name = 3;
 }
-
+/*LabelMapItem的数组形式,类似vector<LabelMapItem>*/
 message LabelMap {
   repeated LabelMapItem item = 1;
 }
 
 // Sample a bbox in the normalized space [0, 1] with provided constraints.
+/*SSD在图像预处理时进行采样操作的数据类,采样box框出的图像才是真正进入模型的训练数据*/
 message Sampler {
+  /*注意这里的bbox时采样框,与loss计算时的box没有任何关系
+    最大尺度与与最小尺度，如果样本几乎是均匀大小的，那么设置为1.0即可.*/
+
   // Minimum scale of the sampled bbox.
   optional float min_scale = 1 [default = 1.];
   // Maximum scale of the sampled bbox.
   optional float max_scale = 2 [default = 1.];
-
+  /*采样的bbox的最大纵横比与最小纵横比，如果样本框几乎都是正方形的，那么设置为1.0就好*/
   // Minimum aspect ratio of the sampled bbox.
   optional float min_aspect_ratio = 3 [default = 1.];
   // Maximum aspect ratio of the sampled bbox.
@@ -67,19 +96,26 @@ message Sampler {
 }
 
 // Constraints for selecting sampled bbox.
+/*采样框的具体内容,仍需注意这个采样框与prior box没有任何关系*/
 message SampleConstraint {
+  /*jaccard(IOU)重叠率阈值*/
+
   // Minimum Jaccard overlap between sampled bbox and all bboxes in
   // AnnotationGroup.
+  /*采样的bbox与AnnotationGroup中的所有bbox之间的最小Jaccard重叠量。*/
   optional float min_jaccard_overlap = 1;
   // Maximum Jaccard overlap between sampled bbox and all bboxes in
   // AnnotationGroup.
+  /*采样的bbox与AnnotationGroup中的所有bbox之间的最大Jaccard重叠量。*/
   optional float max_jaccard_overlap = 2;
 
   // Minimum coverage of sampled bbox by all bboxes in AnnotationGroup.
+  /*AnnotationGroup中所有bbox对采样bbox的最小/最大 覆盖,可选参数,一般不用*/
   optional float min_sample_coverage = 3;
   // Maximum coverage of sampled bbox by all bboxes in AnnotationGroup.
   optional float max_sample_coverage = 4;
 
+  /*采样bbox对AnnotationGroup中所有bbox的最小/最大 覆盖,可选参数,一般不用*/
   // Minimum coverage of all bboxes in AnnotationGroup by sampled bbox.
   optional float min_object_coverage = 5;
   // Maximum coverage of all bboxes in AnnotationGroup by sampled bbox.
@@ -87,8 +123,10 @@ message SampleConstraint {
 }
 
 // Sample a batch of bboxes with provided constraints.
+/*用于保存一批符合要求的采样bbox,可以理解为sampler和sample_constraint的包装类*/
 message BatchSampler {
   // Use original image as the source for sampling.
+  /*使用原始图像作为采样源。*/
   optional bool use_original_image = 1 [default = true];
 
   // Constraints for sampling bbox.
@@ -99,9 +137,11 @@ message BatchSampler {
 
   // If provided, break when found certain number of samples satisfing the
   // sample_constraint.
+  /*可选参数,当采样到足够max_sample数量的样本后中断采样*/
   optional uint32 max_sample = 4;
 
   // Maximum number of trials for sampling to avoid infinite loop.
+  /*避免无限循环采样的最大尝试次数*/
   optional uint32 max_trials = 5 [default = 100];
 }
 
@@ -117,6 +157,7 @@ message EmitConstraint {
 }
 
 // The normalized bounding box [0, 1] w.r.t. the input image size.
+/*归一化后的box类*/
 message NormalizedBBox {
   optional float xmin = 1;
   optional float ymin = 2;
@@ -129,18 +170,21 @@ message NormalizedBBox {
 }
 
 // Annotation for each object instance.
+/*box的包装类*/
 message Annotation {
-  optional int32 instance_id = 1 [default = 0];
-  optional NormalizedBBox bbox = 2;
+  optional int32 instance_id = 1 [default = 0];/*标注了属于哪一个样本(图像)*/
+  optional NormalizedBBox bbox = 2;/*box*/
 }
 
 // Group of annotations for a particular label.
+/*Annotation的数组类,按照label的类别进行了分组*/
 message AnnotationGroup {
-  optional int32 group_label = 1;
+  optional int32 group_label = 1;/*标注了当前box数组都是哪一个class*/
   repeated Annotation annotation = 2;
 }
 
 // An extension of Datum which contains "rich" annotations.
+/*SSD分支下的专用Datum数据类型,包含一个通用的datum,以及保存boxs的annotation_group数组类型*/
 message AnnotatedDatum {
   enum AnnotationType {
     BBOX = 0;
@@ -149,7 +193,7 @@ message AnnotatedDatum {
   // If there are "rich" annotations, specify the type of annotation.
   // Currently it only supports bounding box.
   // If there are no "rich" annotations, use label in datum instead.
-  optional AnnotationType type = 2;
+  optional AnnotationType type = 2;/*可选参数,尚不知道用处*/
   // Each group contains annotation for a particular class.
   repeated AnnotationGroup annotation_group = 3;
 }
@@ -381,8 +425,8 @@ message SolverState {
 }
 
 enum Phase {
-   TRAIN = 0;
-   TEST = 1;
+  TRAIN = 0;
+  TEST = 1;
 }
 
 message NetState {
@@ -437,7 +481,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: recurrent_param)
+// LayerParameter next available layer-specific ID: 148 (last added: ObjDetectDataParameter)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -521,6 +565,7 @@ message LayerParameter {
   optional MultiBoxLossParameter multibox_loss_param = 201;
   optional MVNParameter mvn_param = 120;
   optional NormalizeParameter norm_param = 206;
+  optional ObjDetectDataParameter obj_detect_param = 147;
   optional ParameterParameter parameter_param = 145;
   optional PermuteParameter permute_param = 202;
   optional PoolingParameter pooling_param = 121;
@@ -542,6 +587,12 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
+}
+
+
+message ObjDetectDataParameter {
+  required bool encoded = 1 [default = false];
+  required string label_map_file = 2;
 }
 
 // Message that stores parameters used to apply transformation
@@ -609,7 +660,7 @@ message ResizeParameter {
   // (would use it them to the corresponding channel)
   repeated float pad_value = 6;
 
-  enum Interp_mode { //Same as in OpenCV
+  enum Interp_mode {//Same as in OpenCV
     LINEAR = 1;
     AREA = 2;
     NEAREST = 3;

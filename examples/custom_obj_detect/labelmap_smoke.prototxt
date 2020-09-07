@@ -1,0 +1,45 @@
+item {
+  name: "__background__"
+  label: 0
+  display_name: "__background__"
+}
+item {
+  name: "marker"
+  label: 1
+  display_name: "marker"
+}
+item {
+  name: "smoke_black"
+  label: 2
+  display_name: "smoke_black"
+}
+item {
+  name: "smoke_gray"
+  label: 3
+  display_name: "smoke_gray"
+}
+item {
+  name: "smoke_water"
+  label: 4
+  display_name: "smoke_water"
+}
+item {
+  name: "car"
+  label: 5
+  display_name: "car"
+}
+item {
+  name: "pickup"
+  label: 5
+  display_name: "pickup"
+}
+item {
+  name: "truck"
+  label: 5
+  display_name: "truck"
+}
+item {
+  name: "bus"
+  label: 5
+  display_name: "bus"
+}
