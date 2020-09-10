@@ -59,6 +59,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 
   const int crop_size = param_.crop_size();
   const Dtype scale = param_.scale();
+
   *do_mirror = param_.mirror() && Rand(2);
   const bool has_mean_file = param_.has_mean_file();
   const bool has_uint8 = data.size() > 0;
@@ -88,7 +89,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
 
   int height = datum_height;
   int width = datum_width;
-
+/*crop剪切*/
   int h_off = 0;
   int w_off = 0;
   if (crop_size) {
@@ -116,7 +117,8 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
     for (int h = 0; h < height; ++h) {
       for (int w = 0; w < width; ++w) {
         data_index = (c * datum_height + h_off + h) * datum_width + w_off + w;
-        if (*do_mirror) {
+        /* c*datum_height*datum_width + (h+h_off)*datum_width + (w + w_off) */
+        if (*do_mirror) {/*镜像翻转*/
           top_index = (c * height + h) * width + (width - 1 - w);
         } else {
           top_index = (c * height + h) * width + w;
@@ -127,7 +129,7 @@ void DataTransformer<Dtype>::Transform(const Datum& datum,
         } else {
           datum_element = datum.float_data(data_index);
         }
-        if (has_mean_file) {
+        if (has_mean_file) {/*通道均值化*/
           transformed_data[top_index] =
             (datum_element - mean[data_index]) * scale;
         } else {
@@ -243,9 +245,10 @@ void DataTransformer<Dtype>::Transform(
   // Transform datum.
   const Datum& datum = anno_datum.datum();
   NormalizedBBox crop_bbox;
+  /*crop剪切;镜像翻转;通道均值化*/
   Transform(datum, transformed_blob, &crop_bbox, do_mirror);
 
-  // Transform annotation.
+  // 转换GT bbox数据.
   const bool do_resize = true;
   TransformAnnotation(anno_datum, do_resize, crop_bbox, *do_mirror,
                       transformed_anno_group_all);
@@ -274,7 +277,8 @@ void DataTransformer<Dtype>::Transform(
 
 template<typename Dtype>
 void DataTransformer<Dtype>::Transform(
-    const AnnotatedDatum& anno_datum, Blob<Dtype>* transformed_blob,
+    const AnnotatedDatum& anno_datum,
+    Blob<Dtype>* transformed_blob,
     vector<AnnotationGroup>* transformed_anno_vec) {
   bool do_mirror;
   Transform(anno_datum, transformed_blob, transformed_anno_vec, &do_mirror);
@@ -302,6 +306,7 @@ void DataTransformer<Dtype>::TransformAnnotation(
         if (do_resize && param_.has_resize_param()) {
           CHECK_GT(img_height, 0);
           CHECK_GT(img_width, 0);
+          /*如果图像经过resize,将bbox也进行对应的缩放*/
           UpdateBBoxByResizePolicy(param_.resize_param(), img_width, img_height,
                                    &resize_bbox);
         }
@@ -313,12 +318,11 @@ void DataTransformer<Dtype>::TransformAnnotation(
         NormalizedBBox proj_bbox;
         if (ProjectBBox(crop_bbox, resize_bbox, &proj_bbox)) {
           has_valid_annotation = true;
-          Annotation* transformed_anno =
-              transformed_anno_group.add_annotation();
+          Annotation* transformed_anno = transformed_anno_group.add_annotation();
           transformed_anno->set_instance_id(anno.instance_id());
           NormalizedBBox* transformed_bbox = transformed_anno->mutable_bbox();
           transformed_bbox->CopyFrom(proj_bbox);
-          if (do_mirror) {
+          if (do_mirror) {/*如果画面经过镜像翻转,则bbox也要进行反转*/
             Dtype temp = transformed_bbox->xmin();
             transformed_bbox->set_xmin(1 - transformed_bbox->xmax());
             transformed_bbox->set_xmax(1 - temp);

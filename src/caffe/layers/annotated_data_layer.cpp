@@ -55,8 +55,6 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
   this->transformed_data_.Reshape(top_shape);
   // Reshape top[0] and prefetch_data according to the batch_size.
   top_shape[0] = batch_size;
-  printf("shape:[%i,%i,%i,%i]",top_shape[0],top_shape[1],top_shape[2],top_shape[3]);
-  fflush(stdout);
   top[0]->Reshape(top_shape);
   for (int i = 0; i < this->PREFETCH_COUNT; ++i) {
     this->prefetch_[i].data_.Reshape(top_shape);

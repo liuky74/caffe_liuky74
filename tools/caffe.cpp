@@ -261,7 +261,7 @@ int train() {
             s << (i ? ", " : "") << gpus[i];
         }
         LOG(INFO) << "Using GPUs " << s.str();
-#ifndef CPU_ONLY/*不是CPU模式下,输出CPU信息*/
+#ifndef CPU_ONLY/*不是CPU模式下,输出GPU信息*/
         cudaDeviceProp device_prop;
         for (int i = 0; i < gpus.size(); ++i) {
             cudaGetDeviceProperties(&device_prop, gpus[i]);

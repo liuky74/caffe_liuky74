@@ -245,7 +245,6 @@ namespace caffe {
             net_->set_debug_info(display && param_.debug_info());
             // accumulate the loss and gradient
             Dtype loss = 0;
-            LOG_IF(INFO, Caffe::root_solver()) << "iter size: " << param_.iter_size();
             /* iter_size是为了满足大batch size但是显存不足时使用的,
              * batch_size*iter_size即为实际的单次迭代的实际数据大小*/
             for (int i = 0; i < param_.iter_size(); ++i) {

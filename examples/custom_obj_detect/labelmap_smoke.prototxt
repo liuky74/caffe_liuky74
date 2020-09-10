@@ -19,13 +19,8 @@ item {
   display_name: "smoke_gray"
 }
 item {
-  name: "smoke_water"
-  label: 4
-  display_name: "smoke_water"
-}
-item {
   name: "car"
-  label: 5
+  label: 4
   display_name: "car"
 }
 item {
@@ -35,11 +30,16 @@ item {
 }
 item {
   name: "truck"
-  label: 5
+  label: 6
   display_name: "truck"
 }
 item {
   name: "bus"
-  label: 5
+  label: 7
   display_name: "bus"
+}
+item {
+  name: "smoke_water"
+  label: 8
+  display_name: "smoke_water"
 }
