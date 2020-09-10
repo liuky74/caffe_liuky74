@@ -224,21 +224,27 @@ void LocateBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
   loc_bbox->set_difficult(bbox.difficult());
 }
 
-bool ProjectBBox(const NormalizedBBox& src_bbox, const NormalizedBBox& bbox,
-                 NormalizedBBox* proj_bbox) {
+bool ProjectBBox(
+        const NormalizedBBox& src_bbox, /*crop bbox*/
+        const NormalizedBBox& bbox,/*经过resize变化后的GT bbox*/
+        NormalizedBBox* proj_bbox/*res bbox*/
+        ) {
   if (bbox.xmin() >= src_bbox.xmax() || bbox.xmax() <= src_bbox.xmin() ||
       bbox.ymin() >= src_bbox.ymax() || bbox.ymax() <= src_bbox.ymin()) {
     return false;
   }
+  /*得到裁切后图像的宽高*/
   float src_width = src_bbox.xmax() - src_bbox.xmin();
   float src_height = src_bbox.ymax() - src_bbox.ymin();
+  /*根据裁切的位置对gt bbox进行修正,并归一化到0~1之间*/
   proj_bbox->set_xmin((bbox.xmin() - src_bbox.xmin()) / src_width);
   proj_bbox->set_ymin((bbox.ymin() - src_bbox.ymin()) / src_height);
   proj_bbox->set_xmax((bbox.xmax() - src_bbox.xmin()) / src_width);
   proj_bbox->set_ymax((bbox.ymax() - src_bbox.ymin()) / src_height);
-  proj_bbox->set_difficult(bbox.difficult());
+  proj_bbox->set_difficult(bbox.difficult());/*是否为难分样本*/
+  /*边缘修剪*/
   ClipBBox(*proj_bbox, proj_bbox);
-  if (BBoxSize(*proj_bbox) > 0) {
+  if (BBoxSize(*proj_bbox) > 0) {/*如果调整后的box内面积小于0,则抛弃*/
     return true;
   } else {
     return false;
