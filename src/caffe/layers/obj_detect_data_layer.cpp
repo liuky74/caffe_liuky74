@@ -122,9 +122,10 @@ namespace caffe {
                  * crop裁切
                  * 镜像翻转
                  * 减去各通道均值
-                 * 将GT box数据归一化到0~1之间
-                 最终得到直接进入模型参与计算的数据*/
+                 * 将GT box数据根据crop和翻转进行调整,并归一化到0~1之间
+                 * 最终得到直接进入模型参与计算的数据*/
                 this->data_transformer_->Transform(*sampled_datum, &(this->transformed_data_), &transformed_anno_vec);
+                /*统计转换后的GT label数量*/
                 for (int cls_idx = 0; cls_idx < transformed_anno_vec.size(); ++cls_idx) {
                     num_boxes += transformed_anno_vec[cls_idx].annotation_size();
                 }

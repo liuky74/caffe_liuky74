@@ -482,6 +482,7 @@ message ParamSpec {
 // Update the next available ID when you add a new LayerParameter field.
 //
 // LayerParameter next available layer-specific ID: 148 (last added: ObjDetectDataParameter)
+// LayerParameter next available layer-specific ID: 149 (last added: upsample_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -587,8 +588,12 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
+  optional UpsampleParameter upsample_param = 148;
 }
 
+message UpsampleParameter{
+  optional int32 scale = 1 [default = 1];
+}
 
 message ObjDetectDataParameter {
   required bool encoded = 1 [default = false];
