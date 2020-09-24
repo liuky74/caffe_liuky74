@@ -1,11 +1,11 @@
-name: "VGG_VOC0712_SSD_300x300_test"
+name: "VGG_VOC0712_SSD_300x300_train"
 layer {
     name: "data"
-    type: "ObjDetectData"
+    type: "AnnotatedData"
     top: "data"
     top: "label"
     include {
-        phase: TEST
+        phase: TRAIN
     }
     transform_param {
         mirror: True
@@ -48,15 +48,15 @@ layer {
         mean_value: 123.0
     }
     data_param {
-        source: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/test_data"
-        batch_size: 4
+        source: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/train_data"
+        batch_size: 12
         backend: LMDB
     }
-    obj_detect_param {
-        encoded: false
+    annotated_data_param {
         label_map_file: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
     }
 }
+
 layer {
   name: "slice"
   type: "Slice"
@@ -686,13 +686,16 @@ layer {
   top: "fc7"
 }
 
-
-
 layer {
     bottom: "fc7"
-    top: "BasicRFB0_branch0_BasicConv0"
-    name: "BasicRFB0_branch0_BasicConv0_conv"
+    top: "conv6_1_branch0_BasicConv0"
+    name: "conv6_1_branch0_BasicConv0_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 0
@@ -706,23 +709,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch0_BasicConv0"
-    top: "BasicRFB0_branch0_BasicConv0"
-    name: "BasicRFB0_branch0_BasicConv0_bn"
+    bottom: "conv6_1_branch0_BasicConv0"
+    top: "conv6_1_branch0_BasicConv0"
+    name: "conv6_1_branch0_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch0_BasicConv0"
-    top: "BasicRFB0_branch0_BasicConv0"
-    name: "BasicRFB0_branch0_BasicConv0_relu"
+    bottom: "conv6_1_branch0_BasicConv0"
+    top: "conv6_1_branch0_BasicConv0"
+    name: "conv6_1_branch0_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch0_BasicConv0"
-    top: "BasicRFB0_branch0_BasicConv2"
-    name: "BasicRFB0_branch0_BasicConv2_conv"
+    bottom: "conv6_1_branch0_BasicConv0"
+    top: "conv6_1_branch0_BasicConv2"
+    name: "conv6_1_branch0_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 1
@@ -736,17 +743,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch0_BasicConv2"
-    top: "BasicRFB0_branch0_BasicConv2"
-    name: "BasicRFB0_branch0_BasicConv2_bn"
+    bottom: "conv6_1_branch0_BasicConv2"
+    top: "conv6_1_branch0_BasicConv2"
+    name: "conv6_1_branch0_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
     bottom: "fc7"
-    top: "BasicRFB0_branch1_BasicConv0"
-    name: "BasicRFB0_branch1_BasicConv0_conv"
+    top: "conv6_1_branch1_BasicConv0"
+    name: "conv6_1_branch1_BasicConv0_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -760,22 +772,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv0"
-    top: "BasicRFB0_branch1_BasicConv0"
-    name: "BasicRFB0_branch1_BasicConv0_bn"
+    bottom: "conv6_1_branch1_BasicConv0"
+    top: "conv6_1_branch1_BasicConv0"
+    name: "conv6_1_branch1_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv0"
-    top: "BasicRFB0_branch1_BasicConv0"
-    name: "BasicRFB0_branch1_BasicConv0_relu"
+    bottom: "conv6_1_branch1_BasicConv0"
+    top: "conv6_1_branch1_BasicConv0"
+    name: "conv6_1_branch1_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv0"
-    top: "BasicRFB0_branch1_BasicConv1"
-    name: "BasicRFB0_branch1_BasicConv1_conv"
+    bottom: "conv6_1_branch1_BasicConv0"
+    top: "conv6_1_branch1_BasicConv1"
+    name: "conv6_1_branch1_BasicConv1_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 1
@@ -789,22 +806,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv1"
-    top: "BasicRFB0_branch1_BasicConv1"
-    name: "BasicRFB0_branch1_BasicConv1_bn"
+    bottom: "conv6_1_branch1_BasicConv1"
+    top: "conv6_1_branch1_BasicConv1"
+    name: "conv6_1_branch1_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv1"
-    top: "BasicRFB0_branch1_BasicConv1"
-    name: "BasicRFB0_branch1_BasicConv1_relu"
+    bottom: "conv6_1_branch1_BasicConv1"
+    top: "conv6_1_branch1_BasicConv1"
+    name: "conv6_1_branch1_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv1"
-    top: "BasicRFB0_branch1_BasicConv2"
-    name: "BasicRFB0_branch1_BasicConv2_conv"
+    bottom: "conv6_1_branch1_BasicConv1"
+    top: "conv6_1_branch1_BasicConv2"
+    name: "conv6_1_branch1_BasicConv2_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 3
@@ -818,17 +840,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch1_BasicConv2"
-    top: "BasicRFB0_branch1_BasicConv2"
-    name: "BasicRFB0_branch1_BasicConv2_bn"
+    bottom: "conv6_1_branch1_BasicConv2"
+    top: "conv6_1_branch1_BasicConv2"
+    name: "conv6_1_branch1_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
     bottom: "fc7"
-    top: "BasicRFB0_branch2_BasicConv0"
-    name: "BasicRFB0_branch2_BasicConv0_conv"
+    top: "conv6_1_branch2_BasicConv0"
+    name: "conv6_1_branch2_BasicConv0_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -842,22 +869,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv0"
-    top: "BasicRFB0_branch2_BasicConv0"
-    name: "BasicRFB0_branch2_BasicConv0_bn"
+    bottom: "conv6_1_branch2_BasicConv0"
+    top: "conv6_1_branch2_BasicConv0"
+    name: "conv6_1_branch2_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv0"
-    top: "BasicRFB0_branch2_BasicConv0"
-    name: "BasicRFB0_branch2_BasicConv0_relu"
+    bottom: "conv6_1_branch2_BasicConv0"
+    top: "conv6_1_branch2_BasicConv0"
+    name: "conv6_1_branch2_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv0"
-    top: "BasicRFB0_branch2_BasicConv1"
-    name: "BasicRFB0_branch2_BasicConv1_conv"
+    bottom: "conv6_1_branch2_BasicConv0"
+    top: "conv6_1_branch2_BasicConv1"
+    name: "conv6_1_branch2_BasicConv1_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 192
         pad: 1
@@ -871,22 +903,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv1"
-    top: "BasicRFB0_branch2_BasicConv1"
-    name: "BasicRFB0_branch2_BasicConv1_bn"
+    bottom: "conv6_1_branch2_BasicConv1"
+    top: "conv6_1_branch2_BasicConv1"
+    name: "conv6_1_branch2_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv1"
-    top: "BasicRFB0_branch2_BasicConv1"
-    name: "BasicRFB0_branch2_BasicConv1_relu"
+    bottom: "conv6_1_branch2_BasicConv1"
+    top: "conv6_1_branch2_BasicConv1"
+    name: "conv6_1_branch2_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv1"
-    top: "BasicRFB0_branch2_BasicConv2"
-    name: "BasicRFB0_branch2_BasicConv2_conv"
+    bottom: "conv6_1_branch2_BasicConv1"
+    top: "conv6_1_branch2_BasicConv2"
+    name: "conv6_1_branch2_BasicConv2_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 1
@@ -900,22 +937,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv2"
-    top: "BasicRFB0_branch2_BasicConv2"
-    name: "BasicRFB0_branch2_BasicConv2_bn"
+    bottom: "conv6_1_branch2_BasicConv2"
+    top: "conv6_1_branch2_BasicConv2"
+    name: "conv6_1_branch2_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv2"
-    top: "BasicRFB0_branch2_BasicConv2"
-    name: "BasicRFB0_branch2_BasicConv2_relu"
+    bottom: "conv6_1_branch2_BasicConv2"
+    top: "conv6_1_branch2_BasicConv2"
+    name: "conv6_1_branch2_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv2"
-    top: "BasicRFB0_branch2_BasicConv3"
-    name: "BasicRFB0_branch2_BasicConv3_conv"
+    bottom: "conv6_1_branch2_BasicConv2"
+    top: "conv6_1_branch2_BasicConv3"
+    name: "conv6_1_branch2_BasicConv3_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 5
@@ -929,17 +971,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch2_BasicConv3"
-    top: "BasicRFB0_branch2_BasicConv3"
-    name: "BasicRFB0_branch2_BasicConv3_bn"
+    bottom: "conv6_1_branch2_BasicConv3"
+    top: "conv6_1_branch2_BasicConv3"
+    name: "conv6_1_branch2_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer {
     bottom: "fc7"
-    top: "BasicRFB0_branch3_BasicConv0"
-    name: "BasicRFB0_branch3_BasicConv0_conv"
+    top: "conv6_1_branch3_BasicConv0"
+    name: "conv6_1_branch3_BasicConv0_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -953,22 +1000,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv0"
-    top: "BasicRFB0_branch3_BasicConv0"
-    name: "BasicRFB0_branch3_BasicConv0_bn"
+    bottom: "conv6_1_branch3_BasicConv0"
+    top: "conv6_1_branch3_BasicConv0"
+    name: "conv6_1_branch3_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv0"
-    top: "BasicRFB0_branch3_BasicConv0"
-    name: "BasicRFB0_branch3_BasicConv0_relu"
+    bottom: "conv6_1_branch3_BasicConv0"
+    top: "conv6_1_branch3_BasicConv0"
+    name: "conv6_1_branch3_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv0"
-    top: "BasicRFB0_branch3_BasicConv1"
-    name: "BasicRFB0_branch3_BasicConv1_conv"
+    bottom: "conv6_1_branch3_BasicConv0"
+    top: "conv6_1_branch3_BasicConv1"
+    name: "conv6_1_branch3_BasicConv1_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 192
         pad_h: 0  pad_w: 3
@@ -982,22 +1034,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv1"
-    top: "BasicRFB0_branch3_BasicConv1"
-    name: "BasicRFB0_branch3_BasicConv1_bn"
+    bottom: "conv6_1_branch3_BasicConv1"
+    top: "conv6_1_branch3_BasicConv1"
+    name: "conv6_1_branch3_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv1"
-    top: "BasicRFB0_branch3_BasicConv1"
-    name: "BasicRFB0_branch3_BasicConv1_relu"
+    bottom: "conv6_1_branch3_BasicConv1"
+    top: "conv6_1_branch3_BasicConv1"
+    name: "conv6_1_branch3_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv1"
-    top: "BasicRFB0_branch3_BasicConv2"
-    name: "BasicRFB0_branch3_BasicConv2_conv"
+    bottom: "conv6_1_branch3_BasicConv1"
+    top: "conv6_1_branch3_BasicConv2"
+    name: "conv6_1_branch3_BasicConv2_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad_h: 3  pad_w: 0
@@ -1011,22 +1068,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv2"
-    top: "BasicRFB0_branch3_BasicConv2"
-    name: "BasicRFB0_branch3_BasicConv2_bn"
+    bottom: "conv6_1_branch3_BasicConv2"
+    top: "conv6_1_branch3_BasicConv2"
+    name: "conv6_1_branch3_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv2"
-    top: "BasicRFB0_branch3_BasicConv2"
-    name: "BasicRFB0_branch3_BasicConv2_relu"
+    bottom: "conv6_1_branch3_BasicConv2"
+    top: "conv6_1_branch3_BasicConv2"
+    name: "conv6_1_branch3_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv2"
-    top: "BasicRFB0_branch3_BasicConv3"
-    name: "BasicRFB0_branch3_BasicConv3_conv"
+    bottom: "conv6_1_branch3_BasicConv2"
+    top: "conv6_1_branch3_BasicConv3"
+    name: "conv6_1_branch3_BasicConv3_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 7
@@ -1040,26 +1102,31 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_branch3_BasicConv3"
-    top: "BasicRFB0_branch3_BasicConv3"
-    name: "BasicRFB0_branch3_BasicConv3_bn"
+    bottom: "conv6_1_branch3_BasicConv3"
+    top: "conv6_1_branch3_BasicConv3"
+    name: "conv6_1_branch3_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer{
-    name: "BasicRFB0_Concat"
+    name: "conv6_1_Concat"
     type: "Concat"
-    bottom: "BasicRFB0_branch0_BasicConv2"  bottom: "BasicRFB0_branch1_BasicConv2"  bottom: "BasicRFB0_branch2_BasicConv3"  bottom: "BasicRFB0_branch3_BasicConv3"
-    top: "BasicRFB0_Concat"
+    bottom: "conv6_1_branch0_BasicConv2"  bottom: "conv6_1_branch1_BasicConv2"  bottom: "conv6_1_branch2_BasicConv3"  bottom: "conv6_1_branch3_BasicConv3"  
+    top: "conv6_1_Concat"
     concat_param{
-        axis: 1
+        axis: 1    
     }
 }
 layer {
-    bottom: "BasicRFB0_Concat"
-    top: "BasicRFB0_ConvLinear"
-    name: "BasicRFB0_ConvLinear_conv"
+    bottom: "conv6_1_Concat"
+    top: "conv6_1_ConvLinear"
+    name: "conv6_1_ConvLinear_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 1024
         pad: 0
@@ -1073,16 +1140,21 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_ConvLinear"
-    top: "BasicRFB0_ConvLinear"
-    name: "BasicRFB0_ConvLinear_bn"
+    bottom: "conv6_1_ConvLinear"
+    top: "conv6_1_ConvLinear"
+    name: "conv6_1_ConvLinear_bn"
     type: "BatchNorm"
 }
 layer {
     bottom: "fc7"
-    top: "BasicRFB0_HightWay_BasicConv"
-    name: "BasicRFB0_HightWay_BasicConv_conv"
+    top: "conv6_1_HightWay_BasicConv"
+    name: "conv6_1_HightWay_BasicConv_conv"
     type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 1024
         pad: 0
@@ -1096,33 +1168,37 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB0_HightWay_BasicConv"
-    top: "BasicRFB0_HightWay_BasicConv"
-    name: "BasicRFB0_HightWay_BasicConv_bn"
+    bottom: "conv6_1_HightWay_BasicConv"
+    top: "conv6_1_HightWay_BasicConv"
+    name: "conv6_1_HightWay_BasicConv_bn"
     type: "BatchNorm"
 }
 layer{
-    name: "BasicRFB0_ShurtCut"
+    name: "conv6_1"
     type: "Eltwise"
-    bottom: "BasicRFB0_HightWay_BasicConv"  bottom: "BasicRFB0_ConvLinear"
-    top: "BasicRFB0_ShurtCut"
+    bottom: "conv6_1_HightWay_BasicConv"  bottom: "conv6_1_ConvLinear"  
+    top: "conv6_1"
     eltwise_param {
         operation: SUM
         coeff: 1
         coeff: 1
     }
 }layer {
-    bottom: "BasicRFB0_ShurtCut"
-    top: "BasicRFB0_ShurtCut"
-    name: "BasicRFB0_Relu"
+    bottom: "conv6_1"
+    top: "conv6_1"
+    name: "conv6_1_Relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB0_ShurtCut"
-    top: "BasicRFB1_branch0_BasicConv0"
-    name: "BasicRFB1_branch0_BasicConv0_conv"
+    bottom: "conv6_1"
+    top: "conv6_2_branch0_BasicConv0"
+    name: "conv6_2_branch0_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 0
@@ -1136,23 +1212,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch0_BasicConv0"
-    top: "BasicRFB1_branch0_BasicConv0"
-    name: "BasicRFB1_branch0_BasicConv0_bn"
+    bottom: "conv6_2_branch0_BasicConv0"
+    top: "conv6_2_branch0_BasicConv0"
+    name: "conv6_2_branch0_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch0_BasicConv0"
-    top: "BasicRFB1_branch0_BasicConv0"
-    name: "BasicRFB1_branch0_BasicConv0_relu"
+    bottom: "conv6_2_branch0_BasicConv0"
+    top: "conv6_2_branch0_BasicConv0"
+    name: "conv6_2_branch0_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch0_BasicConv0"
-    top: "BasicRFB1_branch0_BasicConv2"
-    name: "BasicRFB1_branch0_BasicConv2_conv"
+    bottom: "conv6_2_branch0_BasicConv0"
+    top: "conv6_2_branch0_BasicConv2"
+    name: "conv6_2_branch0_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 1
@@ -1166,18 +1246,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch0_BasicConv2"
-    top: "BasicRFB1_branch0_BasicConv2"
-    name: "BasicRFB1_branch0_BasicConv2_bn"
+    bottom: "conv6_2_branch0_BasicConv2"
+    top: "conv6_2_branch0_BasicConv2"
+    name: "conv6_2_branch0_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "BasicRFB0_ShurtCut"
-    top: "BasicRFB1_branch1_BasicConv0"
-    name: "BasicRFB1_branch1_BasicConv0_conv"
+    bottom: "conv6_1"
+    top: "conv6_2_branch1_BasicConv0"
+    name: "conv6_2_branch1_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -1191,23 +1275,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv0"
-    top: "BasicRFB1_branch1_BasicConv0"
-    name: "BasicRFB1_branch1_BasicConv0_bn"
+    bottom: "conv6_2_branch1_BasicConv0"
+    top: "conv6_2_branch1_BasicConv0"
+    name: "conv6_2_branch1_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv0"
-    top: "BasicRFB1_branch1_BasicConv0"
-    name: "BasicRFB1_branch1_BasicConv0_relu"
+    bottom: "conv6_2_branch1_BasicConv0"
+    top: "conv6_2_branch1_BasicConv0"
+    name: "conv6_2_branch1_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv0"
-    top: "BasicRFB1_branch1_BasicConv1"
-    name: "BasicRFB1_branch1_BasicConv1_conv"
+    bottom: "conv6_2_branch1_BasicConv0"
+    top: "conv6_2_branch1_BasicConv1"
+    name: "conv6_2_branch1_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 1
@@ -1221,23 +1309,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv1"
-    top: "BasicRFB1_branch1_BasicConv1"
-    name: "BasicRFB1_branch1_BasicConv1_bn"
+    bottom: "conv6_2_branch1_BasicConv1"
+    top: "conv6_2_branch1_BasicConv1"
+    name: "conv6_2_branch1_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv1"
-    top: "BasicRFB1_branch1_BasicConv1"
-    name: "BasicRFB1_branch1_BasicConv1_relu"
+    bottom: "conv6_2_branch1_BasicConv1"
+    top: "conv6_2_branch1_BasicConv1"
+    name: "conv6_2_branch1_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv1"
-    top: "BasicRFB1_branch1_BasicConv2"
-    name: "BasicRFB1_branch1_BasicConv2_conv"
+    bottom: "conv6_2_branch1_BasicConv1"
+    top: "conv6_2_branch1_BasicConv2"
+    name: "conv6_2_branch1_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 3
@@ -1251,18 +1343,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch1_BasicConv2"
-    top: "BasicRFB1_branch1_BasicConv2"
-    name: "BasicRFB1_branch1_BasicConv2_bn"
+    bottom: "conv6_2_branch1_BasicConv2"
+    top: "conv6_2_branch1_BasicConv2"
+    name: "conv6_2_branch1_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "BasicRFB0_ShurtCut"
-    top: "BasicRFB1_branch2_BasicConv0"
-    name: "BasicRFB1_branch2_BasicConv0_conv"
+    bottom: "conv6_1"
+    top: "conv6_2_branch2_BasicConv0"
+    name: "conv6_2_branch2_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -1276,23 +1372,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv0"
-    top: "BasicRFB1_branch2_BasicConv0"
-    name: "BasicRFB1_branch2_BasicConv0_bn"
+    bottom: "conv6_2_branch2_BasicConv0"
+    top: "conv6_2_branch2_BasicConv0"
+    name: "conv6_2_branch2_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv0"
-    top: "BasicRFB1_branch2_BasicConv0"
-    name: "BasicRFB1_branch2_BasicConv0_relu"
+    bottom: "conv6_2_branch2_BasicConv0"
+    top: "conv6_2_branch2_BasicConv0"
+    name: "conv6_2_branch2_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv0"
-    top: "BasicRFB1_branch2_BasicConv1"
-    name: "BasicRFB1_branch2_BasicConv1_conv"
+    bottom: "conv6_2_branch2_BasicConv0"
+    top: "conv6_2_branch2_BasicConv1"
+    name: "conv6_2_branch2_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 192
         pad: 1
@@ -1306,23 +1406,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv1"
-    top: "BasicRFB1_branch2_BasicConv1"
-    name: "BasicRFB1_branch2_BasicConv1_bn"
+    bottom: "conv6_2_branch2_BasicConv1"
+    top: "conv6_2_branch2_BasicConv1"
+    name: "conv6_2_branch2_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv1"
-    top: "BasicRFB1_branch2_BasicConv1"
-    name: "BasicRFB1_branch2_BasicConv1_relu"
+    bottom: "conv6_2_branch2_BasicConv1"
+    top: "conv6_2_branch2_BasicConv1"
+    name: "conv6_2_branch2_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv1"
-    top: "BasicRFB1_branch2_BasicConv2"
-    name: "BasicRFB1_branch2_BasicConv2_conv"
+    bottom: "conv6_2_branch2_BasicConv1"
+    top: "conv6_2_branch2_BasicConv2"
+    name: "conv6_2_branch2_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 1
@@ -1336,23 +1440,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv2"
-    top: "BasicRFB1_branch2_BasicConv2"
-    name: "BasicRFB1_branch2_BasicConv2_bn"
+    bottom: "conv6_2_branch2_BasicConv2"
+    top: "conv6_2_branch2_BasicConv2"
+    name: "conv6_2_branch2_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv2"
-    top: "BasicRFB1_branch2_BasicConv2"
-    name: "BasicRFB1_branch2_BasicConv2_relu"
+    bottom: "conv6_2_branch2_BasicConv2"
+    top: "conv6_2_branch2_BasicConv2"
+    name: "conv6_2_branch2_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv2"
-    top: "BasicRFB1_branch2_BasicConv3"
-    name: "BasicRFB1_branch2_BasicConv3_conv"
+    bottom: "conv6_2_branch2_BasicConv2"
+    top: "conv6_2_branch2_BasicConv3"
+    name: "conv6_2_branch2_BasicConv3_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 5
@@ -1366,18 +1474,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch2_BasicConv3"
-    top: "BasicRFB1_branch2_BasicConv3"
-    name: "BasicRFB1_branch2_BasicConv3_bn"
+    bottom: "conv6_2_branch2_BasicConv3"
+    top: "conv6_2_branch2_BasicConv3"
+    name: "conv6_2_branch2_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "BasicRFB0_ShurtCut"
-    top: "BasicRFB1_branch3_BasicConv0"
-    name: "BasicRFB1_branch3_BasicConv0_conv"
+    bottom: "conv6_1"
+    top: "conv6_2_branch3_BasicConv0"
+    name: "conv6_2_branch3_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -1391,23 +1503,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv0"
-    top: "BasicRFB1_branch3_BasicConv0"
-    name: "BasicRFB1_branch3_BasicConv0_bn"
+    bottom: "conv6_2_branch3_BasicConv0"
+    top: "conv6_2_branch3_BasicConv0"
+    name: "conv6_2_branch3_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv0"
-    top: "BasicRFB1_branch3_BasicConv0"
-    name: "BasicRFB1_branch3_BasicConv0_relu"
+    bottom: "conv6_2_branch3_BasicConv0"
+    top: "conv6_2_branch3_BasicConv0"
+    name: "conv6_2_branch3_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv0"
-    top: "BasicRFB1_branch3_BasicConv1"
-    name: "BasicRFB1_branch3_BasicConv1_conv"
+    bottom: "conv6_2_branch3_BasicConv0"
+    top: "conv6_2_branch3_BasicConv1"
+    name: "conv6_2_branch3_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 192
         pad_h: 0  pad_w: 3
@@ -1421,23 +1537,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv1"
-    top: "BasicRFB1_branch3_BasicConv1"
-    name: "BasicRFB1_branch3_BasicConv1_bn"
+    bottom: "conv6_2_branch3_BasicConv1"
+    top: "conv6_2_branch3_BasicConv1"
+    name: "conv6_2_branch3_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv1"
-    top: "BasicRFB1_branch3_BasicConv1"
-    name: "BasicRFB1_branch3_BasicConv1_relu"
+    bottom: "conv6_2_branch3_BasicConv1"
+    top: "conv6_2_branch3_BasicConv1"
+    name: "conv6_2_branch3_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv1"
-    top: "BasicRFB1_branch3_BasicConv2"
-    name: "BasicRFB1_branch3_BasicConv2_conv"
+    bottom: "conv6_2_branch3_BasicConv1"
+    top: "conv6_2_branch3_BasicConv2"
+    name: "conv6_2_branch3_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad_h: 3  pad_w: 0
@@ -1451,23 +1571,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv2"
-    top: "BasicRFB1_branch3_BasicConv2"
-    name: "BasicRFB1_branch3_BasicConv2_bn"
+    bottom: "conv6_2_branch3_BasicConv2"
+    top: "conv6_2_branch3_BasicConv2"
+    name: "conv6_2_branch3_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv2"
-    top: "BasicRFB1_branch3_BasicConv2"
-    name: "BasicRFB1_branch3_BasicConv2_relu"
+    bottom: "conv6_2_branch3_BasicConv2"
+    top: "conv6_2_branch3_BasicConv2"
+    name: "conv6_2_branch3_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv2"
-    top: "BasicRFB1_branch3_BasicConv3"
-    name: "BasicRFB1_branch3_BasicConv3_conv"
+    bottom: "conv6_2_branch3_BasicConv2"
+    top: "conv6_2_branch3_BasicConv3"
+    name: "conv6_2_branch3_BasicConv3_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 7
@@ -1481,27 +1605,31 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_branch3_BasicConv3"
-    top: "BasicRFB1_branch3_BasicConv3"
-    name: "BasicRFB1_branch3_BasicConv3_bn"
+    bottom: "conv6_2_branch3_BasicConv3"
+    top: "conv6_2_branch3_BasicConv3"
+    name: "conv6_2_branch3_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer{
-    name: "BasicRFB1_Concat"
+    name: "conv6_2_Concat"
     type: "Concat"
-    bottom: "BasicRFB1_branch0_BasicConv2"  bottom: "BasicRFB1_branch1_BasicConv2"  bottom: "BasicRFB1_branch2_BasicConv3"  bottom: "BasicRFB1_branch3_BasicConv3"
-    top: "BasicRFB1_Concat"
+    bottom: "conv6_2_branch0_BasicConv2"  bottom: "conv6_2_branch1_BasicConv2"  bottom: "conv6_2_branch2_BasicConv3"  bottom: "conv6_2_branch3_BasicConv3"  
+    top: "conv6_2_Concat"
     concat_param{
-        axis: 1
+        axis: 1    
     }
 }
 layer {
-    bottom: "BasicRFB1_Concat"
-    top: "BasicRFB1_ConvLinear"
-    name: "BasicRFB1_ConvLinear_conv"
+    bottom: "conv6_2_Concat"
+    top: "conv6_2_ConvLinear"
+    name: "conv6_2_ConvLinear_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 512
         pad: 0
@@ -1515,17 +1643,21 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_ConvLinear"
-    top: "BasicRFB1_ConvLinear"
-    name: "BasicRFB1_ConvLinear_bn"
+    bottom: "conv6_2_ConvLinear"
+    top: "conv6_2_ConvLinear"
+    name: "conv6_2_ConvLinear_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB0_ShurtCut"
-    top: "BasicRFB1_HightWay_BasicConv"
-    name: "BasicRFB1_HightWay_BasicConv_conv"
+    bottom: "conv6_1"
+    top: "conv6_2_HightWay_BasicConv"
+    name: "conv6_2_HightWay_BasicConv_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 512
         pad: 0
@@ -1539,34 +1671,37 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB1_HightWay_BasicConv"
-    top: "BasicRFB1_HightWay_BasicConv"
-    name: "BasicRFB1_HightWay_BasicConv_bn"
+    bottom: "conv6_2_HightWay_BasicConv"
+    top: "conv6_2_HightWay_BasicConv"
+    name: "conv6_2_HightWay_BasicConv_bn"
     type: "BatchNorm"
 }
 layer{
-    name: "BasicRFB1_ShurtCut"
+    name: "conv6_2"
     type: "Eltwise"
-    bottom: "BasicRFB1_HightWay_BasicConv"  bottom: "BasicRFB1_ConvLinear"
-    top: "BasicRFB1_ShurtCut"
+    bottom: "conv6_2_HightWay_BasicConv"  bottom: "conv6_2_ConvLinear"  
+    top: "conv6_2"
     eltwise_param {
         operation: SUM
         coeff: 1
         coeff: 1
     }
 }layer {
-    bottom: "BasicRFB1_ShurtCut"
-    top: "BasicRFB1_ShurtCut"
-    name: "BasicRFB1_Relu"
+    bottom: "conv6_2"
+    top: "conv6_2"
+    name: "conv6_2_Relu"
     type: "ReLU"
 }
-
 layer {
-    bottom: "BasicRFB1_ShurtCut"
-    top: "BasicRFB2_branch0_BasicConv0"
-    name: "BasicRFB2_branch0_BasicConv0_conv"
+    bottom: "conv6_2"
+    top: "conv7_2_branch0_BasicConv0"
+    name: "conv7_2_branch0_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -1580,23 +1715,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch0_BasicConv0"
-    top: "BasicRFB2_branch0_BasicConv0"
-    name: "BasicRFB2_branch0_BasicConv0_bn"
+    bottom: "conv7_2_branch0_BasicConv0"
+    top: "conv7_2_branch0_BasicConv0"
+    name: "conv7_2_branch0_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch0_BasicConv0"
-    top: "BasicRFB2_branch0_BasicConv0"
-    name: "BasicRFB2_branch0_BasicConv0_relu"
+    bottom: "conv7_2_branch0_BasicConv0"
+    top: "conv7_2_branch0_BasicConv0"
+    name: "conv7_2_branch0_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch0_BasicConv0"
-    top: "BasicRFB2_branch0_BasicConv2"
-    name: "BasicRFB2_branch0_BasicConv2_conv"
+    bottom: "conv7_2_branch0_BasicConv0"
+    top: "conv7_2_branch0_BasicConv2"
+    name: "conv7_2_branch0_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 1
@@ -1610,18 +1749,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch0_BasicConv2"
-    top: "BasicRFB2_branch0_BasicConv2"
-    name: "BasicRFB2_branch0_BasicConv2_bn"
+    bottom: "conv7_2_branch0_BasicConv2"
+    top: "conv7_2_branch0_BasicConv2"
+    name: "conv7_2_branch0_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "BasicRFB1_ShurtCut"
-    top: "BasicRFB2_branch1_BasicConv0"
-    name: "BasicRFB2_branch1_BasicConv0_conv"
+    bottom: "conv6_2"
+    top: "conv7_2_branch1_BasicConv0"
+    name: "conv7_2_branch1_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -1635,23 +1778,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv0"
-    top: "BasicRFB2_branch1_BasicConv0"
-    name: "BasicRFB2_branch1_BasicConv0_bn"
+    bottom: "conv7_2_branch1_BasicConv0"
+    top: "conv7_2_branch1_BasicConv0"
+    name: "conv7_2_branch1_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv0"
-    top: "BasicRFB2_branch1_BasicConv0"
-    name: "BasicRFB2_branch1_BasicConv0_relu"
+    bottom: "conv7_2_branch1_BasicConv0"
+    top: "conv7_2_branch1_BasicConv0"
+    name: "conv7_2_branch1_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv0"
-    top: "BasicRFB2_branch1_BasicConv1"
-    name: "BasicRFB2_branch1_BasicConv1_conv"
+    bottom: "conv7_2_branch1_BasicConv0"
+    top: "conv7_2_branch1_BasicConv1"
+    name: "conv7_2_branch1_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 1
@@ -1665,23 +1812,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv1"
-    top: "BasicRFB2_branch1_BasicConv1"
-    name: "BasicRFB2_branch1_BasicConv1_bn"
+    bottom: "conv7_2_branch1_BasicConv1"
+    top: "conv7_2_branch1_BasicConv1"
+    name: "conv7_2_branch1_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv1"
-    top: "BasicRFB2_branch1_BasicConv1"
-    name: "BasicRFB2_branch1_BasicConv1_relu"
+    bottom: "conv7_2_branch1_BasicConv1"
+    top: "conv7_2_branch1_BasicConv1"
+    name: "conv7_2_branch1_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv1"
-    top: "BasicRFB2_branch1_BasicConv2"
-    name: "BasicRFB2_branch1_BasicConv2_conv"
+    bottom: "conv7_2_branch1_BasicConv1"
+    top: "conv7_2_branch1_BasicConv2"
+    name: "conv7_2_branch1_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 3
@@ -1695,18 +1846,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch1_BasicConv2"
-    top: "BasicRFB2_branch1_BasicConv2"
-    name: "BasicRFB2_branch1_BasicConv2_bn"
+    bottom: "conv7_2_branch1_BasicConv2"
+    top: "conv7_2_branch1_BasicConv2"
+    name: "conv7_2_branch1_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "BasicRFB1_ShurtCut"
-    top: "BasicRFB2_branch2_BasicConv0"
-    name: "BasicRFB2_branch2_BasicConv0_conv"
+    bottom: "conv6_2"
+    top: "conv7_2_branch2_BasicConv0"
+    name: "conv7_2_branch2_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -1720,23 +1875,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv0"
-    top: "BasicRFB2_branch2_BasicConv0"
-    name: "BasicRFB2_branch2_BasicConv0_bn"
+    bottom: "conv7_2_branch2_BasicConv0"
+    top: "conv7_2_branch2_BasicConv0"
+    name: "conv7_2_branch2_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv0"
-    top: "BasicRFB2_branch2_BasicConv0"
-    name: "BasicRFB2_branch2_BasicConv0_relu"
+    bottom: "conv7_2_branch2_BasicConv0"
+    top: "conv7_2_branch2_BasicConv0"
+    name: "conv7_2_branch2_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv0"
-    top: "BasicRFB2_branch2_BasicConv1"
-    name: "BasicRFB2_branch2_BasicConv1_conv"
+    bottom: "conv7_2_branch2_BasicConv0"
+    top: "conv7_2_branch2_BasicConv1"
+    name: "conv7_2_branch2_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 96
         pad: 1
@@ -1750,23 +1909,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv1"
-    top: "BasicRFB2_branch2_BasicConv1"
-    name: "BasicRFB2_branch2_BasicConv1_bn"
+    bottom: "conv7_2_branch2_BasicConv1"
+    top: "conv7_2_branch2_BasicConv1"
+    name: "conv7_2_branch2_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv1"
-    top: "BasicRFB2_branch2_BasicConv1"
-    name: "BasicRFB2_branch2_BasicConv1_relu"
+    bottom: "conv7_2_branch2_BasicConv1"
+    top: "conv7_2_branch2_BasicConv1"
+    name: "conv7_2_branch2_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv1"
-    top: "BasicRFB2_branch2_BasicConv2"
-    name: "BasicRFB2_branch2_BasicConv2_conv"
+    bottom: "conv7_2_branch2_BasicConv1"
+    top: "conv7_2_branch2_BasicConv2"
+    name: "conv7_2_branch2_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 1
@@ -1780,23 +1943,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv2"
-    top: "BasicRFB2_branch2_BasicConv2"
-    name: "BasicRFB2_branch2_BasicConv2_bn"
+    bottom: "conv7_2_branch2_BasicConv2"
+    top: "conv7_2_branch2_BasicConv2"
+    name: "conv7_2_branch2_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv2"
-    top: "BasicRFB2_branch2_BasicConv2"
-    name: "BasicRFB2_branch2_BasicConv2_relu"
+    bottom: "conv7_2_branch2_BasicConv2"
+    top: "conv7_2_branch2_BasicConv2"
+    name: "conv7_2_branch2_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv2"
-    top: "BasicRFB2_branch2_BasicConv3"
-    name: "BasicRFB2_branch2_BasicConv3_conv"
+    bottom: "conv7_2_branch2_BasicConv2"
+    top: "conv7_2_branch2_BasicConv3"
+    name: "conv7_2_branch2_BasicConv3_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 5
@@ -1810,18 +1977,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch2_BasicConv3"
-    top: "BasicRFB2_branch2_BasicConv3"
-    name: "BasicRFB2_branch2_BasicConv3_bn"
+    bottom: "conv7_2_branch2_BasicConv3"
+    top: "conv7_2_branch2_BasicConv3"
+    name: "conv7_2_branch2_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "BasicRFB1_ShurtCut"
-    top: "BasicRFB2_branch3_BasicConv0"
-    name: "BasicRFB2_branch3_BasicConv0_conv"
+    bottom: "conv6_2"
+    top: "conv7_2_branch3_BasicConv0"
+    name: "conv7_2_branch3_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -1835,23 +2006,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv0"
-    top: "BasicRFB2_branch3_BasicConv0"
-    name: "BasicRFB2_branch3_BasicConv0_bn"
+    bottom: "conv7_2_branch3_BasicConv0"
+    top: "conv7_2_branch3_BasicConv0"
+    name: "conv7_2_branch3_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv0"
-    top: "BasicRFB2_branch3_BasicConv0"
-    name: "BasicRFB2_branch3_BasicConv0_relu"
+    bottom: "conv7_2_branch3_BasicConv0"
+    top: "conv7_2_branch3_BasicConv0"
+    name: "conv7_2_branch3_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv0"
-    top: "BasicRFB2_branch3_BasicConv1"
-    name: "BasicRFB2_branch3_BasicConv1_conv"
+    bottom: "conv7_2_branch3_BasicConv0"
+    top: "conv7_2_branch3_BasicConv1"
+    name: "conv7_2_branch3_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 96
         pad_h: 0  pad_w: 3
@@ -1865,23 +2040,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv1"
-    top: "BasicRFB2_branch3_BasicConv1"
-    name: "BasicRFB2_branch3_BasicConv1_bn"
+    bottom: "conv7_2_branch3_BasicConv1"
+    top: "conv7_2_branch3_BasicConv1"
+    name: "conv7_2_branch3_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv1"
-    top: "BasicRFB2_branch3_BasicConv1"
-    name: "BasicRFB2_branch3_BasicConv1_relu"
+    bottom: "conv7_2_branch3_BasicConv1"
+    top: "conv7_2_branch3_BasicConv1"
+    name: "conv7_2_branch3_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv1"
-    top: "BasicRFB2_branch3_BasicConv2"
-    name: "BasicRFB2_branch3_BasicConv2_conv"
+    bottom: "conv7_2_branch3_BasicConv1"
+    top: "conv7_2_branch3_BasicConv2"
+    name: "conv7_2_branch3_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad_h: 3  pad_w: 0
@@ -1895,23 +2074,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv2"
-    top: "BasicRFB2_branch3_BasicConv2"
-    name: "BasicRFB2_branch3_BasicConv2_bn"
+    bottom: "conv7_2_branch3_BasicConv2"
+    top: "conv7_2_branch3_BasicConv2"
+    name: "conv7_2_branch3_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv2"
-    top: "BasicRFB2_branch3_BasicConv2"
-    name: "BasicRFB2_branch3_BasicConv2_relu"
+    bottom: "conv7_2_branch3_BasicConv2"
+    top: "conv7_2_branch3_BasicConv2"
+    name: "conv7_2_branch3_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv2"
-    top: "BasicRFB2_branch3_BasicConv3"
-    name: "BasicRFB2_branch3_BasicConv3_conv"
+    bottom: "conv7_2_branch3_BasicConv2"
+    top: "conv7_2_branch3_BasicConv3"
+    name: "conv7_2_branch3_BasicConv3_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 7
@@ -1925,27 +2108,31 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_branch3_BasicConv3"
-    top: "BasicRFB2_branch3_BasicConv3"
-    name: "BasicRFB2_branch3_BasicConv3_bn"
+    bottom: "conv7_2_branch3_BasicConv3"
+    top: "conv7_2_branch3_BasicConv3"
+    name: "conv7_2_branch3_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer{
-    name: "BasicRFB2_Concat"
+    name: "conv7_2_Concat"
     type: "Concat"
-    bottom: "BasicRFB2_branch0_BasicConv2"  bottom: "BasicRFB2_branch1_BasicConv2"  bottom: "BasicRFB2_branch2_BasicConv3"  bottom: "BasicRFB2_branch3_BasicConv3"
-    top: "BasicRFB2_Concat"
+    bottom: "conv7_2_branch0_BasicConv2"  bottom: "conv7_2_branch1_BasicConv2"  bottom: "conv7_2_branch2_BasicConv3"  bottom: "conv7_2_branch3_BasicConv3"  
+    top: "conv7_2_Concat"
     concat_param{
-        axis: 1
+        axis: 1    
     }
 }
 layer {
-    bottom: "BasicRFB2_Concat"
-    top: "BasicRFB2_ConvLinear"
-    name: "BasicRFB2_ConvLinear_conv"
+    bottom: "conv7_2_Concat"
+    top: "conv7_2_ConvLinear"
+    name: "conv7_2_ConvLinear_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 0
@@ -1959,17 +2146,21 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_ConvLinear"
-    top: "BasicRFB2_ConvLinear"
-    name: "BasicRFB2_ConvLinear_bn"
+    bottom: "conv7_2_ConvLinear"
+    top: "conv7_2_ConvLinear"
+    name: "conv7_2_ConvLinear_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB1_ShurtCut"
-    top: "BasicRFB2_HightWay_BasicConv"
-    name: "BasicRFB2_HightWay_BasicConv_conv"
+    bottom: "conv6_2"
+    top: "conv7_2_HightWay_BasicConv"
+    name: "conv7_2_HightWay_BasicConv_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 0
@@ -1983,34 +2174,38 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB2_HightWay_BasicConv"
-    top: "BasicRFB2_HightWay_BasicConv"
-    name: "BasicRFB2_HightWay_BasicConv_bn"
+    bottom: "conv7_2_HightWay_BasicConv"
+    top: "conv7_2_HightWay_BasicConv"
+    name: "conv7_2_HightWay_BasicConv_bn"
     type: "BatchNorm"
 }
 layer{
-    name: "BasicRFB2_ShurtCut"
+    name: "conv7_2"
     type: "Eltwise"
-    bottom: "BasicRFB2_HightWay_BasicConv"  bottom: "BasicRFB2_ConvLinear"
-    top: "BasicRFB2_ShurtCut"
+    bottom: "conv7_2_HightWay_BasicConv"  bottom: "conv7_2_ConvLinear"  
+    top: "conv7_2"
     eltwise_param {
         operation: SUM
         coeff: 1
         coeff: 1
     }
 }layer {
-    bottom: "BasicRFB2_ShurtCut"
-    top: "BasicRFB2_ShurtCut"
-    name: "BasicRFB2_Relu"
+    bottom: "conv7_2"
+    top: "conv7_2"
+    name: "conv7_2_Relu"
     type: "ReLU"
 }
 
 layer {
-    bottom: "BasicRFB2_ShurtCut"
-    top: "BoneBasicConv0"
-    name: "BoneBasicConv0_conv"
+    bottom: "conv7_2"
+    top: "conv8_1"
+    name: "conv8_1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -2024,26 +2219,30 @@ layer {
     }
 }
 layer {
-    bottom: "BoneBasicConv0"
-    top: "BoneBasicConv0"
-    name: "BoneBasicConv0_bn"
+    bottom: "conv8_1"
+    top: "conv8_1"
+    name: "conv8_1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BoneBasicConv0"
-    top: "BoneBasicConv0"
-    name: "BoneBasicConv0_relu"
+    bottom: "conv8_1"
+    top: "conv8_1"
+    name: "conv8_1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BoneBasicConv0"
-    top: "BoneBasicConv1"
-    name: "BoneBasicConv1_conv"
+    bottom: "conv8_1"
+    top: "conv8_2"
+    name: "conv8_2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
-        pad: 1
+        pad: 0
         kernel_size: 3
         stride:1
         dilation:1
@@ -2054,23 +2253,27 @@ layer {
     }
 }
 layer {
-    bottom: "BoneBasicConv1"
-    top: "BoneBasicConv1"
-    name: "BoneBasicConv1_bn"
+    bottom: "conv8_2"
+    top: "conv8_2"
+    name: "conv8_2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BoneBasicConv1"
-    top: "BoneBasicConv1"
-    name: "BoneBasicConv1_relu"
+    bottom: "conv8_2"
+    top: "conv8_2"
+    name: "conv8_2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BoneBasicConv1"
-    top: "BoneBasicConv2"
-    name: "BoneBasicConv2_conv"
+    bottom: "conv8_2"
+    top: "conv9_1"
+    name: "conv9_1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 128
         pad: 0
@@ -2084,26 +2287,30 @@ layer {
     }
 }
 layer {
-    bottom: "BoneBasicConv2"
-    top: "BoneBasicConv2"
-    name: "BoneBasicConv2_bn"
+    bottom: "conv9_1"
+    top: "conv9_1"
+    name: "conv9_1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BoneBasicConv2"
-    top: "BoneBasicConv2"
-    name: "BoneBasicConv2_relu"
+    bottom: "conv9_1"
+    top: "conv9_1"
+    name: "conv9_1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BoneBasicConv2"
-    top: "BoneBasicConv3"
-    name: "BoneBasicConv3_conv"
+    bottom: "conv9_1"
+    top: "conv9_2"
+    name: "conv9_2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
-        pad: 1
+        pad: 0
         kernel_size: 3
         stride:1
         dilation:1
@@ -2114,24 +2321,33 @@ layer {
     }
 }
 layer {
-    bottom: "BoneBasicConv3"
-    top: "BoneBasicConv3"
-    name: "BoneBasicConv3_bn"
+    bottom: "conv9_2"
+    top: "conv9_2"
+    name: "conv9_2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BoneBasicConv3"
-    top: "BoneBasicConv3"
-    name: "BoneBasicConv3_relu"
+    bottom: "conv9_2"
+    top: "conv9_2"
+    name: "conv9_2_relu"
     type: "ReLU"
 }
+
+
+
+
+
 
 layer {
     bottom: "conv4_3"
     top: "FeatureMap0_0"
     name: "FeatureMap0_0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 0
@@ -2161,7 +2377,11 @@ layer {
     top: "FeatureMap0_1"
     name: "FeatureMap0_1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 256
         pad: 0
@@ -2187,29 +2407,55 @@ layer {
     type: "ReLU"
 }
 layer {
+    name: "FeatureMap0_1_Upsample_deconv"
+    type: "Deconvolution"
     bottom: "FeatureMap0_1"
-    top: "FeatureMap0_1"
-    name: "FeatureMap0_1_Upsample"
-    type: "Upsample"
-    upsample_param {
-        scale: 2
+    top: "FeatureMap0_1_Upsample"
+    param {
+        lr_mult: 1
+        decay_mult: 1
     }
-}
-layer{
-    name: "FeatureMap0_Concat"
-    type: "Concat"
-    bottom: "FeatureMap0_0"  bottom: "FeatureMap0_1"
-    top: "FeatureMap0_Concat"
-    concat_param{
-        axis: 1
+    convolution_param {
+        num_output: 256
+        bias_term: false
+        kernel_size: 2
+        pad: 0
+        stride: 2
     }
 }
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch0_BasicConv0"
-    name: "BasicRFB_a0_branch0_BasicConv0_conv"
-    type: "Convolution"
+    bottom: "FeatureMap0_1_Upsample"
+    top: "FeatureMap0_1_Upsample"
+    name: "FeatureMap0_1_Upsample_bn"
+    type: "BatchNorm"
+}
 
+layer{
+    name: "FeatureMap0_Cat"
+    type: "Concat"
+    bottom: "FeatureMap0_0"  bottom: "FeatureMap0_1_Upsample"  
+    top: "FeatureMap0_Cat"
+    concat_param{
+        axis: 1    
+    }
+}
+
+
+
+
+
+
+
+layer {
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch0_BasicConv0"
+    name: "conv4_3_norm_branch0_BasicConv0_conv"
+    type: "Convolution"
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -2223,23 +2469,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch0_BasicConv0"
-    top: "BasicRFB_a0_branch0_BasicConv0"
-    name: "BasicRFB_a0_branch0_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch0_BasicConv0"
+    top: "conv4_3_norm_branch0_BasicConv0"
+    name: "conv4_3_norm_branch0_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch0_BasicConv0"
-    top: "BasicRFB_a0_branch0_BasicConv0"
-    name: "BasicRFB_a0_branch0_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch0_BasicConv0"
+    top: "conv4_3_norm_branch0_BasicConv0"
+    name: "conv4_3_norm_branch0_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch0_BasicConv0"
-    top: "BasicRFB_a0_branch0_BasicConv2"
-    name: "BasicRFB_a0_branch0_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch0_BasicConv0"
+    top: "conv4_3_norm_branch0_BasicConv2"
+    name: "conv4_3_norm_branch0_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 1
@@ -2253,18 +2503,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch0_BasicConv2"
-    top: "BasicRFB_a0_branch0_BasicConv2"
-    name: "BasicRFB_a0_branch0_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch0_BasicConv2"
+    top: "conv4_3_norm_branch0_BasicConv2"
+    name: "conv4_3_norm_branch0_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch1_BasicConv0"
-    name: "BasicRFB_a0_branch1_BasicConv0_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch1_BasicConv0"
+    name: "conv4_3_norm_branch1_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -2278,23 +2532,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv0"
-    top: "BasicRFB_a0_branch1_BasicConv0"
-    name: "BasicRFB_a0_branch1_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch1_BasicConv0"
+    top: "conv4_3_norm_branch1_BasicConv0"
+    name: "conv4_3_norm_branch1_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv0"
-    top: "BasicRFB_a0_branch1_BasicConv0"
-    name: "BasicRFB_a0_branch1_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch1_BasicConv0"
+    top: "conv4_3_norm_branch1_BasicConv0"
+    name: "conv4_3_norm_branch1_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv0"
-    top: "BasicRFB_a0_branch1_BasicConv1"
-    name: "BasicRFB_a0_branch1_BasicConv1_conv"
+    bottom: "conv4_3_norm_branch1_BasicConv0"
+    top: "conv4_3_norm_branch1_BasicConv1"
+    name: "conv4_3_norm_branch1_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad_h: 1  pad_w: 0
@@ -2308,23 +2566,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv1"
-    top: "BasicRFB_a0_branch1_BasicConv1"
-    name: "BasicRFB_a0_branch1_BasicConv1_bn"
+    bottom: "conv4_3_norm_branch1_BasicConv1"
+    top: "conv4_3_norm_branch1_BasicConv1"
+    name: "conv4_3_norm_branch1_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv1"
-    top: "BasicRFB_a0_branch1_BasicConv1"
-    name: "BasicRFB_a0_branch1_BasicConv1_relu"
+    bottom: "conv4_3_norm_branch1_BasicConv1"
+    top: "conv4_3_norm_branch1_BasicConv1"
+    name: "conv4_3_norm_branch1_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv1"
-    top: "BasicRFB_a0_branch1_BasicConv2"
-    name: "BasicRFB_a0_branch1_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch1_BasicConv1"
+    top: "conv4_3_norm_branch1_BasicConv2"
+    name: "conv4_3_norm_branch1_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 3
@@ -2338,18 +2600,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch1_BasicConv2"
-    top: "BasicRFB_a0_branch1_BasicConv2"
-    name: "BasicRFB_a0_branch1_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch1_BasicConv2"
+    top: "conv4_3_norm_branch1_BasicConv2"
+    name: "conv4_3_norm_branch1_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch2_BasicConv0"
-    name: "BasicRFB_a0_branch2_BasicConv0_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch2_BasicConv0"
+    name: "conv4_3_norm_branch2_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -2363,23 +2629,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv0"
-    top: "BasicRFB_a0_branch2_BasicConv0"
-    name: "BasicRFB_a0_branch2_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch2_BasicConv0"
+    top: "conv4_3_norm_branch2_BasicConv0"
+    name: "conv4_3_norm_branch2_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv0"
-    top: "BasicRFB_a0_branch2_BasicConv0"
-    name: "BasicRFB_a0_branch2_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch2_BasicConv0"
+    top: "conv4_3_norm_branch2_BasicConv0"
+    name: "conv4_3_norm_branch2_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv0"
-    top: "BasicRFB_a0_branch2_BasicConv1"
-    name: "BasicRFB_a0_branch2_BasicConv1_conv"
+    bottom: "conv4_3_norm_branch2_BasicConv0"
+    top: "conv4_3_norm_branch2_BasicConv1"
+    name: "conv4_3_norm_branch2_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad_h: 0  pad_w: 1
@@ -2393,23 +2663,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv1"
-    top: "BasicRFB_a0_branch2_BasicConv1"
-    name: "BasicRFB_a0_branch2_BasicConv1_bn"
+    bottom: "conv4_3_norm_branch2_BasicConv1"
+    top: "conv4_3_norm_branch2_BasicConv1"
+    name: "conv4_3_norm_branch2_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv1"
-    top: "BasicRFB_a0_branch2_BasicConv1"
-    name: "BasicRFB_a0_branch2_BasicConv1_relu"
+    bottom: "conv4_3_norm_branch2_BasicConv1"
+    top: "conv4_3_norm_branch2_BasicConv1"
+    name: "conv4_3_norm_branch2_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv1"
-    top: "BasicRFB_a0_branch2_BasicConv2"
-    name: "BasicRFB_a0_branch2_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch2_BasicConv1"
+    top: "conv4_3_norm_branch2_BasicConv2"
+    name: "conv4_3_norm_branch2_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 3
@@ -2423,18 +2697,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch2_BasicConv2"
-    top: "BasicRFB_a0_branch2_BasicConv2"
-    name: "BasicRFB_a0_branch2_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch2_BasicConv2"
+    top: "conv4_3_norm_branch2_BasicConv2"
+    name: "conv4_3_norm_branch2_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch3_BasicConv0"
-    name: "BasicRFB_a0_branch3_BasicConv0_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch3_BasicConv0"
+    name: "conv4_3_norm_branch3_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -2448,23 +2726,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv0"
-    top: "BasicRFB_a0_branch3_BasicConv0"
-    name: "BasicRFB_a0_branch3_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch3_BasicConv0"
+    top: "conv4_3_norm_branch3_BasicConv0"
+    name: "conv4_3_norm_branch3_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv0"
-    top: "BasicRFB_a0_branch3_BasicConv0"
-    name: "BasicRFB_a0_branch3_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch3_BasicConv0"
+    top: "conv4_3_norm_branch3_BasicConv0"
+    name: "conv4_3_norm_branch3_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv0"
-    top: "BasicRFB_a0_branch3_BasicConv1"
-    name: "BasicRFB_a0_branch3_BasicConv1_conv"
+    bottom: "conv4_3_norm_branch3_BasicConv0"
+    top: "conv4_3_norm_branch3_BasicConv1"
+    name: "conv4_3_norm_branch3_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad_h: 1  pad_w: 0
@@ -2478,23 +2760,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv1"
-    top: "BasicRFB_a0_branch3_BasicConv1"
-    name: "BasicRFB_a0_branch3_BasicConv1_bn"
+    bottom: "conv4_3_norm_branch3_BasicConv1"
+    top: "conv4_3_norm_branch3_BasicConv1"
+    name: "conv4_3_norm_branch3_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv1"
-    top: "BasicRFB_a0_branch3_BasicConv1"
-    name: "BasicRFB_a0_branch3_BasicConv1_relu"
+    bottom: "conv4_3_norm_branch3_BasicConv1"
+    top: "conv4_3_norm_branch3_BasicConv1"
+    name: "conv4_3_norm_branch3_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv1"
-    top: "BasicRFB_a0_branch3_BasicConv2"
-    name: "BasicRFB_a0_branch3_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch3_BasicConv1"
+    top: "conv4_3_norm_branch3_BasicConv2"
+    name: "conv4_3_norm_branch3_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 5
@@ -2508,18 +2794,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch3_BasicConv2"
-    top: "BasicRFB_a0_branch3_BasicConv2"
-    name: "BasicRFB_a0_branch3_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch3_BasicConv2"
+    top: "conv4_3_norm_branch3_BasicConv2"
+    name: "conv4_3_norm_branch3_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch4_BasicConv0"
-    name: "BasicRFB_a0_branch4_BasicConv0_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch4_BasicConv0"
+    name: "conv4_3_norm_branch4_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 0
@@ -2533,23 +2823,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv0"
-    top: "BasicRFB_a0_branch4_BasicConv0"
-    name: "BasicRFB_a0_branch4_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch4_BasicConv0"
+    top: "conv4_3_norm_branch4_BasicConv0"
+    name: "conv4_3_norm_branch4_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv0"
-    top: "BasicRFB_a0_branch4_BasicConv0"
-    name: "BasicRFB_a0_branch4_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch4_BasicConv0"
+    top: "conv4_3_norm_branch4_BasicConv0"
+    name: "conv4_3_norm_branch4_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv0"
-    top: "BasicRFB_a0_branch4_BasicConv1"
-    name: "BasicRFB_a0_branch4_BasicConv1_conv"
+    bottom: "conv4_3_norm_branch4_BasicConv0"
+    top: "conv4_3_norm_branch4_BasicConv1"
+    name: "conv4_3_norm_branch4_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad_h: 0  pad_w: 1
@@ -2563,23 +2857,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv1"
-    top: "BasicRFB_a0_branch4_BasicConv1"
-    name: "BasicRFB_a0_branch4_BasicConv1_bn"
+    bottom: "conv4_3_norm_branch4_BasicConv1"
+    top: "conv4_3_norm_branch4_BasicConv1"
+    name: "conv4_3_norm_branch4_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv1"
-    top: "BasicRFB_a0_branch4_BasicConv1"
-    name: "BasicRFB_a0_branch4_BasicConv1_relu"
+    bottom: "conv4_3_norm_branch4_BasicConv1"
+    top: "conv4_3_norm_branch4_BasicConv1"
+    name: "conv4_3_norm_branch4_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv1"
-    top: "BasicRFB_a0_branch4_BasicConv2"
-    name: "BasicRFB_a0_branch4_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch4_BasicConv1"
+    top: "conv4_3_norm_branch4_BasicConv2"
+    name: "conv4_3_norm_branch4_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 5
@@ -2593,18 +2891,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch4_BasicConv2"
-    top: "BasicRFB_a0_branch4_BasicConv2"
-    name: "BasicRFB_a0_branch4_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch4_BasicConv2"
+    top: "conv4_3_norm_branch4_BasicConv2"
+    name: "conv4_3_norm_branch4_BasicConv2_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch5_BasicConv0"
-    name: "BasicRFB_a0_branch5_BasicConv0_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch5_BasicConv0"
+    name: "conv4_3_norm_branch5_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 32
         pad: 0
@@ -2618,23 +2920,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv0"
-    top: "BasicRFB_a0_branch5_BasicConv0"
-    name: "BasicRFB_a0_branch5_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch5_BasicConv0"
+    top: "conv4_3_norm_branch5_BasicConv0"
+    name: "conv4_3_norm_branch5_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv0"
-    top: "BasicRFB_a0_branch5_BasicConv0"
-    name: "BasicRFB_a0_branch5_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch5_BasicConv0"
+    top: "conv4_3_norm_branch5_BasicConv0"
+    name: "conv4_3_norm_branch5_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv0"
-    top: "BasicRFB_a0_branch5_BasicConv1"
-    name: "BasicRFB_a0_branch5_BasicConv1_conv"
+    bottom: "conv4_3_norm_branch5_BasicConv0"
+    top: "conv4_3_norm_branch5_BasicConv1"
+    name: "conv4_3_norm_branch5_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 48
         pad_h: 0  pad_w: 1
@@ -2648,23 +2954,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv1"
-    top: "BasicRFB_a0_branch5_BasicConv1"
-    name: "BasicRFB_a0_branch5_BasicConv1_bn"
+    bottom: "conv4_3_norm_branch5_BasicConv1"
+    top: "conv4_3_norm_branch5_BasicConv1"
+    name: "conv4_3_norm_branch5_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv1"
-    top: "BasicRFB_a0_branch5_BasicConv1"
-    name: "BasicRFB_a0_branch5_BasicConv1_relu"
+    bottom: "conv4_3_norm_branch5_BasicConv1"
+    top: "conv4_3_norm_branch5_BasicConv1"
+    name: "conv4_3_norm_branch5_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv1"
-    top: "BasicRFB_a0_branch5_BasicConv2"
-    name: "BasicRFB_a0_branch5_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch5_BasicConv1"
+    top: "conv4_3_norm_branch5_BasicConv2"
+    name: "conv4_3_norm_branch5_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad_h: 1  pad_w: 0
@@ -2678,23 +2988,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv2"
-    top: "BasicRFB_a0_branch5_BasicConv2"
-    name: "BasicRFB_a0_branch5_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch5_BasicConv2"
+    top: "conv4_3_norm_branch5_BasicConv2"
+    name: "conv4_3_norm_branch5_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv2"
-    top: "BasicRFB_a0_branch5_BasicConv2"
-    name: "BasicRFB_a0_branch5_BasicConv2_relu"
+    bottom: "conv4_3_norm_branch5_BasicConv2"
+    top: "conv4_3_norm_branch5_BasicConv2"
+    name: "conv4_3_norm_branch5_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv2"
-    top: "BasicRFB_a0_branch5_BasicConv3"
-    name: "BasicRFB_a0_branch5_BasicConv3_conv"
+    bottom: "conv4_3_norm_branch5_BasicConv2"
+    top: "conv4_3_norm_branch5_BasicConv3"
+    name: "conv4_3_norm_branch5_BasicConv3_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 7
@@ -2708,18 +3022,22 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch5_BasicConv3"
-    top: "BasicRFB_a0_branch5_BasicConv3"
-    name: "BasicRFB_a0_branch5_BasicConv3_bn"
+    bottom: "conv4_3_norm_branch5_BasicConv3"
+    top: "conv4_3_norm_branch5_BasicConv3"
+    name: "conv4_3_norm_branch5_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_branch6_BasicConv0"
-    name: "BasicRFB_a0_branch6_BasicConv0_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_branch6_BasicConv0"
+    name: "conv4_3_norm_branch6_BasicConv0_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 32
         pad: 0
@@ -2733,23 +3051,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv0"
-    top: "BasicRFB_a0_branch6_BasicConv0"
-    name: "BasicRFB_a0_branch6_BasicConv0_bn"
+    bottom: "conv4_3_norm_branch6_BasicConv0"
+    top: "conv4_3_norm_branch6_BasicConv0"
+    name: "conv4_3_norm_branch6_BasicConv0_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv0"
-    top: "BasicRFB_a0_branch6_BasicConv0"
-    name: "BasicRFB_a0_branch6_BasicConv0_relu"
+    bottom: "conv4_3_norm_branch6_BasicConv0"
+    top: "conv4_3_norm_branch6_BasicConv0"
+    name: "conv4_3_norm_branch6_BasicConv0_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv0"
-    top: "BasicRFB_a0_branch6_BasicConv1"
-    name: "BasicRFB_a0_branch6_BasicConv1_conv"
+    bottom: "conv4_3_norm_branch6_BasicConv0"
+    top: "conv4_3_norm_branch6_BasicConv1"
+    name: "conv4_3_norm_branch6_BasicConv1_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 48
         pad_h: 1  pad_w: 0
@@ -2763,23 +3085,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv1"
-    top: "BasicRFB_a0_branch6_BasicConv1"
-    name: "BasicRFB_a0_branch6_BasicConv1_bn"
+    bottom: "conv4_3_norm_branch6_BasicConv1"
+    top: "conv4_3_norm_branch6_BasicConv1"
+    name: "conv4_3_norm_branch6_BasicConv1_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv1"
-    top: "BasicRFB_a0_branch6_BasicConv1"
-    name: "BasicRFB_a0_branch6_BasicConv1_relu"
+    bottom: "conv4_3_norm_branch6_BasicConv1"
+    top: "conv4_3_norm_branch6_BasicConv1"
+    name: "conv4_3_norm_branch6_BasicConv1_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv1"
-    top: "BasicRFB_a0_branch6_BasicConv2"
-    name: "BasicRFB_a0_branch6_BasicConv2_conv"
+    bottom: "conv4_3_norm_branch6_BasicConv1"
+    top: "conv4_3_norm_branch6_BasicConv2"
+    name: "conv4_3_norm_branch6_BasicConv2_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad_h: 0  pad_w: 1
@@ -2793,23 +3119,27 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv2"
-    top: "BasicRFB_a0_branch6_BasicConv2"
-    name: "BasicRFB_a0_branch6_BasicConv2_bn"
+    bottom: "conv4_3_norm_branch6_BasicConv2"
+    top: "conv4_3_norm_branch6_BasicConv2"
+    name: "conv4_3_norm_branch6_BasicConv2_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv2"
-    top: "BasicRFB_a0_branch6_BasicConv2"
-    name: "BasicRFB_a0_branch6_BasicConv2_relu"
+    bottom: "conv4_3_norm_branch6_BasicConv2"
+    top: "conv4_3_norm_branch6_BasicConv2"
+    name: "conv4_3_norm_branch6_BasicConv2_relu"
     type: "ReLU"
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv2"
-    top: "BasicRFB_a0_branch6_BasicConv3"
-    name: "BasicRFB_a0_branch6_BasicConv3_conv"
+    bottom: "conv4_3_norm_branch6_BasicConv2"
+    top: "conv4_3_norm_branch6_BasicConv3"
+    name: "conv4_3_norm_branch6_BasicConv3_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 64
         pad: 7
@@ -2823,27 +3153,31 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_branch6_BasicConv3"
-    top: "BasicRFB_a0_branch6_BasicConv3"
-    name: "BasicRFB_a0_branch6_BasicConv3_bn"
+    bottom: "conv4_3_norm_branch6_BasicConv3"
+    top: "conv4_3_norm_branch6_BasicConv3"
+    name: "conv4_3_norm_branch6_BasicConv3_bn"
     type: "BatchNorm"
 }
 
 layer{
-    name: "BasicRFB_a0_Concat"
+    name: "conv4_3_norm_Concat"
     type: "Concat"
-    bottom: "BasicRFB_a0_branch0_BasicConv2"  bottom: "BasicRFB_a0_branch1_BasicConv2"  bottom: "BasicRFB_a0_branch2_BasicConv2"  bottom: "BasicRFB_a0_branch3_BasicConv2"  bottom: "BasicRFB_a0_branch4_BasicConv2"  bottom: "BasicRFB_a0_branch5_BasicConv3"  bottom: "BasicRFB_a0_branch6_BasicConv3"
-    top: "BasicRFB_a0_Concat"
+    bottom: "conv4_3_norm_branch0_BasicConv2"  bottom: "conv4_3_norm_branch1_BasicConv2"  bottom: "conv4_3_norm_branch2_BasicConv2"  bottom: "conv4_3_norm_branch3_BasicConv2"  bottom: "conv4_3_norm_branch4_BasicConv2"  bottom: "conv4_3_norm_branch5_BasicConv3"  bottom: "conv4_3_norm_branch6_BasicConv3"  
+    top: "conv4_3_norm_Concat"
     concat_param{
-        axis: 1
+        axis: 1    
     }
 }
 layer {
-    bottom: "BasicRFB_a0_Concat"
-    top: "BasicRFB_a0_ConvLinear"
-    name: "BasicRFB_a0_ConvLinear_conv"
+    bottom: "conv4_3_norm_Concat"
+    top: "conv4_3_norm_ConvLinear"
+    name: "conv4_3_norm_ConvLinear_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 512
         pad: 0
@@ -2857,17 +3191,21 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_ConvLinear"
-    top: "BasicRFB_a0_ConvLinear"
-    name: "BasicRFB_a0_ConvLinear_bn"
+    bottom: "conv4_3_norm_ConvLinear"
+    top: "conv4_3_norm_ConvLinear"
+    name: "conv4_3_norm_ConvLinear_bn"
     type: "BatchNorm"
 }
 layer {
-    bottom: "FeatureMap0_Concat"
-    top: "BasicRFB_a0_HightWay_BasicConv"
-    name: "BasicRFB_a0_HightWay_BasicConv_conv"
+    bottom: "FeatureMap0_Cat"
+    top: "conv4_3_norm_HightWay_BasicConv"
+    name: "conv4_3_norm_HightWay_BasicConv_conv"
     type: "Convolution"
-
+    param
+    {
+        lr_mult: 1.0
+        decay_mult: 1.0
+    }
     convolution_param {
         num_output: 512
         pad: 0
@@ -2881,35 +3219,53 @@ layer {
     }
 }
 layer {
-    bottom: "BasicRFB_a0_HightWay_BasicConv"
-    top: "BasicRFB_a0_HightWay_BasicConv"
-    name: "BasicRFB_a0_HightWay_BasicConv_bn"
+    bottom: "conv4_3_norm_HightWay_BasicConv"
+    top: "conv4_3_norm_HightWay_BasicConv"
+    name: "conv4_3_norm_HightWay_BasicConv_bn"
     type: "BatchNorm"
 }
 layer{
-    name: "BasicRFB_a0_ShurtCut"
+    name: "conv4_3_norm_ShurtCut"
     type: "Eltwise"
-    bottom: "BasicRFB_a0_HightWay_BasicConv"  bottom: "BasicRFB_a0_ConvLinear"
-    top: "BasicRFB_a0_ShurtCut"
+    bottom: "conv4_3_norm_HightWay_BasicConv"  bottom: "conv4_3_norm_ConvLinear"  
+    top: "conv4_3_norm_ShurtCut"
     eltwise_param {
         operation: SUM
         coeff: 1
         coeff: 1
     }
 }layer {
-    bottom: "BasicRFB_a0_ShurtCut"
-    top: "BasicRFB_a0_ShurtCut"
-    name: "BasicRFB_a0_Relu"
+    bottom: "conv4_3_norm_ShurtCut"
+    top: "conv4_3_norm_ShurtCut"
+    name: "conv4_3_norm_Relu"
     type: "ReLU"
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 layer {
   name: "conv4_3_norm_mbox_loc"
   type: "Convolution"
-  bottom: "BasicRFB_a0_ShurtCut"
+  bottom: "conv4_3_norm_ShurtCut"
   top: "conv4_3_norm_mbox_loc"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 16
     pad: 1
@@ -2948,9 +3304,16 @@ layer {
 layer {
   name: "conv4_3_norm_mbox_conf"
   type: "Convolution"
-  bottom: "BasicRFB_a0_ShurtCut"
+  bottom: "conv4_3_norm_ShurtCut"
   top: "conv4_3_norm_mbox_conf"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 36
     pad: 1
@@ -2989,7 +3352,7 @@ layer {
 layer {
   name: "conv4_3_norm_mbox_priorbox"
   type: "PriorBox"
-  bottom: "BasicRFB_a0_ShurtCut"
+  bottom: "conv4_3_norm_ShurtCut"
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox"
   prior_box_param {
@@ -3009,9 +3372,16 @@ layer {
 layer {
   name: "fc7_mbox_loc"
   type: "Convolution"
-  bottom: "BasicRFB0_ShurtCut"
+  bottom: "conv6_1"
   top: "fc7_mbox_loc"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 24
     pad: 1
@@ -3050,9 +3420,16 @@ layer {
 layer {
   name: "fc7_mbox_conf"
   type: "Convolution"
-  bottom: "BasicRFB0_ShurtCut"
+  bottom: "conv6_1"
   top: "fc7_mbox_conf"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 54
     pad: 1
@@ -3091,7 +3468,7 @@ layer {
 layer {
   name: "fc7_mbox_priorbox"
   type: "PriorBox"
-  bottom: "BasicRFB0_ShurtCut"
+  bottom: "conv6_1"
   bottom: "data"
   top: "fc7_mbox_priorbox"
   prior_box_param {
@@ -3112,9 +3489,16 @@ layer {
 layer {
   name: "conv6_2_mbox_loc"
   type: "Convolution"
-  bottom: "BasicRFB1_ShurtCut"
+  bottom: "conv6_2"
   top: "conv6_2_mbox_loc"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 24
     pad: 1
@@ -3153,9 +3537,16 @@ layer {
 layer {
   name: "conv6_2_mbox_conf"
   type: "Convolution"
-  bottom: "BasicRFB1_ShurtCut"
+  bottom: "conv6_2"
   top: "conv6_2_mbox_conf"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 54
     pad: 1
@@ -3194,7 +3585,7 @@ layer {
 layer {
   name: "conv6_2_mbox_priorbox"
   type: "PriorBox"
-  bottom: "BasicRFB1_ShurtCut"
+  bottom: "conv6_2"
   bottom: "data"
   top: "conv6_2_mbox_priorbox"
   prior_box_param {
@@ -3215,9 +3606,16 @@ layer {
 layer {
   name: "conv7_2_mbox_loc"
   type: "Convolution"
-  bottom: "BasicRFB2_ShurtCut"
+  bottom: "conv7_2"
   top: "conv7_2_mbox_loc"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 24
     pad: 1
@@ -3256,9 +3654,16 @@ layer {
 layer {
   name: "conv7_2_mbox_conf"
   type: "Convolution"
-  bottom: "BasicRFB2_ShurtCut"
+  bottom: "conv7_2"
   top: "conv7_2_mbox_conf"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 54
     pad: 1
@@ -3297,7 +3702,7 @@ layer {
 layer {
   name: "conv7_2_mbox_priorbox"
   type: "PriorBox"
-  bottom: "BasicRFB2_ShurtCut"
+  bottom: "conv7_2"
   bottom: "data"
   top: "conv7_2_mbox_priorbox"
   prior_box_param {
@@ -3318,9 +3723,16 @@ layer {
 layer {
   name: "conv8_2_mbox_loc"
   type: "Convolution"
-  bottom: "BoneBasicConv1"
+  bottom: "conv8_2"
   top: "conv8_2_mbox_loc"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 16
     pad: 1
@@ -3359,9 +3771,16 @@ layer {
 layer {
   name: "conv8_2_mbox_conf"
   type: "Convolution"
-  bottom: "BoneBasicConv1"
+  bottom: "conv8_2"
   top: "conv8_2_mbox_conf"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 36
     pad: 1
@@ -3400,7 +3819,7 @@ layer {
 layer {
   name: "conv8_2_mbox_priorbox"
   type: "PriorBox"
-  bottom: "BoneBasicConv1"
+  bottom: "conv8_2"
   bottom: "data"
   top: "conv8_2_mbox_priorbox"
   prior_box_param {
@@ -3420,9 +3839,16 @@ layer {
 layer {
   name: "conv9_2_mbox_loc"
   type: "Convolution"
-  bottom: "BoneBasicConv3"
+  bottom: "conv9_2"
   top: "conv9_2_mbox_loc"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 16
     pad: 1
@@ -3461,9 +3887,16 @@ layer {
 layer {
   name: "conv9_2_mbox_conf"
   type: "Convolution"
-  bottom: "BoneBasicConv3"
+  bottom: "conv9_2"
   top: "conv9_2_mbox_conf"
-
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
   convolution_param {
     num_output: 36
     pad: 1
@@ -3502,7 +3935,7 @@ layer {
 layer {
   name: "conv9_2_mbox_priorbox"
   type: "PriorBox"
-  bottom: "BoneBasicConv3"
+  bottom: "conv9_2"
   bottom: "data"
   top: "conv9_2_mbox_priorbox"
   prior_box_param {
@@ -3562,82 +3995,39 @@ layer {
   }
 }
 layer {
-  name: "mbox_conf_reshape"
-  type: "Reshape"
-  bottom: "mbox_conf"
-  top: "mbox_conf_reshape"
-  reshape_param {
-    shape {
-      dim: 0
-      dim: -1
-      dim: 9
-    }
-  }
-}
-layer {
-  name: "mbox_conf_softmax"
-  type: "Softmax"
-  bottom: "mbox_conf_reshape"
-  top: "mbox_conf_softmax"
-  softmax_param {
-    axis: 2
-  }
-}
-layer {
-  name: "mbox_conf_flatten"
-  type: "Flatten"
-  bottom: "mbox_conf_softmax"
-  top: "mbox_conf_flatten"
-  flatten_param {
-    axis: 1
-  }
-}
-layer {
-  name: "detection_out"
-  type: "DetectionOutput"
+  name: "mbox_loss"
+  type: "MultiBoxLoss"
   bottom: "mbox_loc"
-  bottom: "mbox_conf_flatten"
+  bottom: "mbox_conf"
   bottom: "mbox_priorbox"
-  top: "detection_out"
+  bottom: "label"
+  top: "mbox_loss"
   include {
-    phase: TEST
+    phase: TRAIN
   }
-  detection_output_param {
+  propagate_down: true
+  propagate_down: true
+  propagate_down: false
+  propagate_down: false
+  loss_param {
+    normalization: VALID
+  }
+  multibox_loss_param {
+    loc_loss_type: SMOOTH_L1
+    conf_loss_type: SOFTMAX
+    loc_weight: 1.0
     num_classes: 9
     share_location: true
-    background_label_id: 0
-    nms_param {
-      nms_threshold: 0.44999998807907104
-      top_k: 400
-    }
-    save_output_param {
-      output_directory: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/Main"
-      output_name_prefix: "comp4_det_test_"
-      output_format: "VOC"
-      label_map_file: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
-      name_size_file: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/test_name_size.txt"
-      num_test_image: 173
-    }
-    code_type: CENTER_SIZE
-    keep_top_k: 200
-    confidence_threshold: 0.009999999776482582
-  }
-}
-layer {
-  name: "detection_eval"
-  type: "DetectionEvaluate"
-  bottom: "detection_out"
-  bottom: "label"
-  top: "detection_eval"
-  include {
-    phase: TEST
-  }
-  detection_evaluate_param {
-    num_classes: 9
-    background_label_id: 0
+    match_type: PER_PREDICTION
     overlap_threshold: 0.5
-    evaluate_difficult_gt: false
-    name_size_file: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/test_name_size.txt"
+    use_prior_for_matching: true
+    background_label_id: 0
+    use_difficult_gt: true
+    neg_pos_ratio: 3.0
+    neg_overlap: 0.5
+    code_type: CENTER_SIZE
+    ignore_cross_boundary_bbox: false
+    mining_type: MAX_NEGATIVE
   }
 }
 
