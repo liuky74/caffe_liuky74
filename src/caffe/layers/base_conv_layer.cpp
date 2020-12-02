@@ -324,7 +324,7 @@ namespace caffe {
 
 /*---反向运算------------------------------------------------------------------------------------------------------------*/
     template<typename Dtype>
-    /**/
+    /*如果本层的梯度需要继续向bottom层传递,则还要计算input的梯度,因为本层的input是bottom层的output*/
     void BaseConvolutionLayer<Dtype>::backward_cpu_gemm(const Dtype *output,
                                                         const Dtype *weights, Dtype *input) {
         Dtype *col_buff = col_buffer_.mutable_cpu_data();
@@ -332,6 +332,8 @@ namespace caffe {
             col_buff = input;
         }
         for (int g = 0; g < group_; ++g) {
+            /*c = alpha*a*b + beta*c函数的运用,按照公式input_diff = output_diff * weights,
+             * 即alpha = 1, a = weights, b = output_diff, beta = 0即input_diff不参与运算, c=input_diff是指向了储存位置的指针*/
             caffe_cpu_gemm<Dtype>(CblasTrans, CblasNoTrans,
                                   kernel_dim_,
                                   conv_out_spatial_dim_,

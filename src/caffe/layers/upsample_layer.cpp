@@ -24,8 +24,9 @@ namespace caffe {
     }
 
     template <typename Dtype>
-    void UpsampleLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-                                           const vector<Blob<Dtype>*>& top) {
+    void UpsampleLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,/*本层的输入*/
+                                           const vector<Blob<Dtype>*>& top/*本层的输出,上层的输入*/
+                                           ) {
 
         int N = top[0]->shape(0);
         int C = top[0]->shape(1);
@@ -34,13 +35,14 @@ namespace caffe {
 
         const Dtype *input = bottom[0]->cpu_data();
         Dtype *output = top[0]->mutable_cpu_data();
-        for (int n = 0; n < N; n++) {
-            for (int c = 0; c < C; c++) {
-                for (int h = 0; h < H; h++) {
-                    for (int w = 0; w < W; w++) {
-                        int nw = w/scale_;
+        /*上采样操作,根据公式将bottom的像素成scale倍放入top*/
+        for (int n = 0; n < N; n++) {/*按照N C H W的结构,注意大写表示这是输出的WH大小*/
+            for (int c = 0; c < C; c++) {/*通道channel*/
+                for (int h = 0; h < H; h++) {/*高height*/
+                    for (int w = 0; w < W; w++) {/*宽width*/
+                        int nw = w/scale_;/*scale_即上采样倍率,注意小写的wh位输入的wh大小*/
                         int nh = h/scale_;
-                        int out_idx = (((n * C + c) * H) + h) * W + w;
+                        int out_idx = (((n * C + c) * H) + h) * W + w;/* 即n*C*H*W + c*H*W + h*W +w, 是输出top的像素idx */
                         int in_idx = (((n * C + c) * (H / scale_)) + nh) * (W / scale_) + nw;
                         output[out_idx] = input[in_idx];
                     }
@@ -56,8 +58,8 @@ namespace caffe {
         int C = bottom[0]->shape(1);
         int H = bottom[0]->shape(2);
         int W = bottom[0]->shape(3);
-        const Dtype *output_grad = top[0]->cpu_diff();
-        Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+        const Dtype *output_grad = top[0]->cpu_diff();/*取出top的diff*/
+        Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();/*取出bottom的diff指针,此时bottom diff尚未计算*/
         caffe_set(bottom[0]->count(), Dtype(0), bottom_diff);
         for (int n = 0; n < N; n++) {
             for (int c = 0; c < C; c++) {
@@ -67,10 +69,10 @@ namespace caffe {
                             for (int j = 0; j < scale_; j++) {
                                 int nw = w * scale_ + i;
                                 int nh = h * scale_ + j;
-                                int out_idx = (((n * C + c) * H) + h) * W + w;
-                                int in_idx = (((n * C + c) * (H * scale_))
+                                int out_idx = (((n * C + c) * H) + h) * W + w;/*找出top的像素idx*/
+                                int in_idx = (((n * C + c) * (H * scale_))/*找出bottom的像素idx*/
                                               + nh) * (W * scale_) + nw;
-                                bottom_diff[out_idx] += output_grad[in_idx];
+                                bottom_diff[out_idx] += output_grad[in_idx];/*将对应像素的diff累加即是反向传递*/
                             }
                         }
                     }
