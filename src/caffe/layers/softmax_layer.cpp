@@ -63,9 +63,9 @@ template <typename Dtype>
 void SoftmaxLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down,
     const vector<Blob<Dtype>*>& bottom) {
-  const Dtype* top_diff = top[0]->cpu_diff();
-  const Dtype* top_data = top[0]->cpu_data();
-  Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+  const Dtype* top_diff = top[0]->cpu_diff();/*来自top的diff，用于计算本层的diff*/
+  const Dtype* top_data = top[0]->cpu_data();/*来自top的数据，y=wx+b中的y*/
+  Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();/*存储diff的计算结果*/
   Dtype* scale_data = scale_.mutable_cpu_data();
   int channels = top[0]->shape(softmax_axis_);
   int dim = top[0]->count() / outer_num_;

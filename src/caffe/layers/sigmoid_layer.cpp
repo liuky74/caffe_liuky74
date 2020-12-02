@@ -31,8 +31,8 @@ void SigmoidLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     const int count = bottom[0]->count();
     for (int i = 0; i < count; ++i) {
-      const Dtype sigmoid_x = top_data[i];
-      bottom_diff[i] = top_diff[i] * sigmoid_x * (1. - sigmoid_x);
+      const Dtype sigmoid_x = top_data[i];/*top_data为sigmoid的计算结果，即y=sigmoid(x)中的y*/
+      bottom_diff[i] = top_diff[i] * sigmoid_x * (1. - sigmoid_x);/*f(x)=sigmoid(x)的导函数为sigmoid(x)*(1-sigmoid(x))*/
     }
   }
 }
