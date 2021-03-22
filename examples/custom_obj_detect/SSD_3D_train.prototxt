@@ -1026,7 +1026,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 36
+    num_output: 28
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1142,7 +1142,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 54
+    num_output: 42
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1259,7 +1259,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 54
+    num_output: 42
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1376,7 +1376,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 54
+    num_output: 42
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1493,7 +1493,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 36
+    num_output: 28
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1609,7 +1609,7 @@ layer {
     decay_mult: 0.0
   }
   convolution_param {
-    num_output: 36
+    num_output: 28
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1727,7 +1727,7 @@ layer {
     loc_loss_type: SMOOTH_L1
     conf_loss_type: SOFTMAX
     loc_weight: 1.0
-    num_classes: 9
+    num_classes: 7
     share_location: true
     match_type: PER_PREDICTION
     overlap_threshold: 0.5
