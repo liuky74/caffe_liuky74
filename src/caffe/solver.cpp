@@ -241,7 +241,7 @@ namespace caffe {
             for (int i = 0; i < callbacks_.size(); ++i) {
                 callbacks_[i]->on_start();
             }
-            const bool display = param_.display() && iter_ % param_.display() == 0;
+            const bool display = param_.display() && iter_ % param_.display() == 0;/*判断是否需要展示训练信息*/
             net_->set_debug_info(display && param_.debug_info());
             // accumulate the loss and gradient
             Dtype loss = 0;
@@ -280,7 +280,7 @@ namespace caffe {
             for (int i = 0; i < callbacks_.size(); ++i) {
                 callbacks_[i]->on_gradients_ready();
             }
-            ApplyUpdate();/*这个类由各个Solver子类实现(比如SGDSolver)*/
+            ApplyUpdate();/*更新权重,这个类由各个Solver子类实现(比如SGDSolver)*/
 
             // Increment the internal iter_ counter -- its value should always indicate
             // the number of times the weights have been updated.

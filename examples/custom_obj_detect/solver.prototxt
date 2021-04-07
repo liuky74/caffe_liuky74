@@ -1,5 +1,5 @@
-train_net: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/SSD_3D_train.prototxt"
-test_net: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/SSD_3D_test.prototxt"
+train_net: "/workspace/caffe/examples/custom_obj_detect/SSD_3D_train.prototxt"
+test_net: "/workspace/caffe/examples/custom_obj_detect/SSD_3D_test.prototxt"
 test_iter: 100
 test_interval: 1000
 base_lr: 0.0010000000474974513
@@ -10,7 +10,7 @@ gamma: 0.10000000149011612
 momentum: 0.8999999761581421
 weight_decay: 0.0005000000237487257
 snapshot: 80000
-snapshot_prefix: "/home/liuky/HDD_1/workspace/C/caffe/models/VGGNet/custom_obj_detect/SSD_300x300/smoke_detect_300x300"
+snapshot_prefix: "/workspace/caffe/models/VGGNet/custom_obj_detect/SSD_300x300/smoke_detect_300x300"
 solver_mode: GPU
 device_id: 0
 debug_info: false

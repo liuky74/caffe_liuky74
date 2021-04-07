@@ -48,13 +48,13 @@ layer {
         mean_value: 123.0
     }
     data_param {
-        source: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/test_data"
+        source: "/workspace/data/smokeCar_lmdb/smoke_car_test_lmdb"
         batch_size: 4
         backend: LMDB
     }
     obj_detect_param {
         encoded: false
-        label_map_file: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
+        label_map_file: "/home/liuky/HDD_1/workspace/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
     }
 }
 layer {
@@ -1714,7 +1714,7 @@ layer {
     shape {
       dim: 0
       dim: -1
-      dim: 9
+      dim: 7
     }
   }
 }
@@ -1755,12 +1755,12 @@ layer {
       top_k: 400
     }
     save_output_param {
-      output_directory: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/Main"
+      output_directory: "/workspace/caffe/data/custom_obj_detect/Main"
       output_name_prefix: "comp4_det_test_"
       output_format: "VOC"
-      label_map_file: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
-      name_size_file: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/test_name_size.txt"
-      num_test_image: 173
+      label_map_file: "/workspace/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
+      name_size_file: "/workspace/data/smoke/train_data/rebuild_datas/XinXiang_dataset/test_file_names.txt"
+      num_test_image: 129
     }
     code_type: CENTER_SIZE
     keep_top_k: 200
@@ -1781,7 +1781,7 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    name_size_file: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/test_name_size.txt"
+    name_size_file: "/workspace/data/smoke/train_data/rebuild_datas/XinXiang_dataset/test_file_names.txt"
   }
 }
 

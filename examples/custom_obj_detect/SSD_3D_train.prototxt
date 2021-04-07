@@ -48,13 +48,13 @@ layer {
         mean_value: 123.0
     }
     data_param {
-        source: "/home/liuky/HDD_1/workspace/C/caffe/data/custom_obj_detect/train_data"
+        source: "/workspace/data/smokeCar_lmdb/smoke_car_train_lmdb"
         batch_size: 16
         backend: LMDB
     }
     obj_detect_param {
         encoded: false
-        label_map_file: "/home/liuky/HDD_1/workspace/C/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
+        label_map_file: "/workspace/caffe/examples/custom_obj_detect/labelmap_smoke.prototxt"
     }
 }
 

@@ -61,10 +61,10 @@ DEFINE_string(weights, "",/*加载预训练模型权重参数，便于网络fine
               "separated by ','. Cannot be set simultaneously with snapshot.");
 DEFINE_int32(iterations, 50,
              "The number of iterations to run.");
-DEFINE_string(sigint_effect, "stop",
+DEFINE_string(sigint_effect, "stop",/*交互信号,表示停止训练*/
               "Optional; action to take when a SIGINT signal is received: "
               "snapshot, stop or none.");
-DEFINE_string(sighup_effect, "snapshot",
+DEFINE_string(sighup_effect, "snapshot",/*交互信号,表示进行节点保存*/
               "Optional; action to take when a SIGHUP signal is received: "
               "snapshot, stop or none.");
 
@@ -94,7 +94,7 @@ BrewMap g_brew_map;/*声明一个上文的这个容器类*/
 #define RegisterBrewFunction(func) \
 namespace { \
 class __Registerer_##func { \
- public: /* 将定义的类注册到g_brew_map容器中 */ \
+ public: /* 将传入的函数指针注册到g_brew_map容器中 */ \
   __Registerer_##func() { \
     g_brew_map[#func] = &func; \
   } \
@@ -105,6 +105,7 @@ __Registerer_##func g_registerer_##func; \
 /*在caffe.cpp 中 BrewFunction 作为GetBrewFunction()函数的返回类型，
   可以是 train()，test()，device_query()，time() 这四个函数指针的其中一个。
   在train()，test()，中可以调用solver类的函数，从而进入到net，进入到每一层，运行整个caffe程序。
+  此外GetBrewFunction()函数是一个宏定义的函数
   */
 static BrewFunction GetBrewFunction(const caffe::string &name) {
     if (g_brew_map.count(name)) {/*判断输入的是不是g_brew_map中train，test，device_query，time中一个*/
@@ -221,11 +222,11 @@ caffe::SolverAction::Enum GetRequestedAction(
 /*模型的训练函数,训练或者微调网络都是走这个分支*/
 int train() {
     /*google的glog库，检查--solver、--snapshot和--weight并输出消息；必须有指定solver，并且snapshot和weight两者只需指定其一；*/
-    CHECK_GT(FLAGS_solver.size(), 0) << "Need a solver definition to train.";
-    CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())/*必须传入solver文件*/
+    CHECK_GT(FLAGS_solver.size(), 0) << "Need a solver definition to train.";/*必须传入solver文件*/
+    CHECK(!FLAGS_snapshot.size() || !FLAGS_weights.size())/*snapshot或者weights两者必须至少传入一个*/
                                                                   << "Give a snapshot to resume training or weights to finetune "
                                                                      "but not both.";
-    vector<string> stages = get_stages_from_flags();
+    vector<string> stages = get_stages_from_flags();/*flag开关,获取传入的整个flags参数表后得到的各项功能的参数开关*/
     /*声明一个solver解算器参数类*/
     /*SolverParameter是通过Google Protocol Buffer自动生成的一个类*/
     caffe::SolverParameter solver_param;/*定义SolverParameter的对象，该类保存solver参数和相应的方法*/
@@ -274,12 +275,15 @@ int train() {
         Caffe::set_solver_count(gpus.size());
     }
     /* 信号捕获器
-     * 处理snapshot, stop or none信号，其声明在include/caffe/util/signal_Handler.h中
-     * GetRequestedAction在caffe.cpp中，将‘stop’，‘snapshot’，‘none’转换为标准信号，即解析；
+     * 上文中利用google flag定义了不同的信号,信号捕获器就是用于处理他们的
+     * SignalHandler用于处理snapshot, stop or none信号，其声明在include/caffe/util/signal_Handler.h中
+     * GetRequestedAction将‘stop’，‘snapshot’，‘none’字符串转换为caffe中定义好的枚举变量,代码会根据枚举值执行不同的函数；
      */
-    caffe::SignalHandler signal_handler(
-            GetRequestedAction(FLAGS_sigint_effect),
-            GetRequestedAction(FLAGS_sighup_effect));
+    /*FLAGS_sigint_effect是定义好的参数,GetRequestedAction将参数转化为枚举值,比如1,然后传入signal_handler,
+     * signal_handler*/
+    auto a = GetRequestedAction(FLAGS_sigint_effect);
+    auto b = GetRequestedAction(FLAGS_sighup_effect);
+    caffe::SignalHandler signal_handler(a,b);
     /* 将定义好的参数传入solver类,创建solver解算器对象并使用智能指针进行包装
      * 注意CreateSolver(solver_param)函数已经初始化了解算器
      * 初始化流程:
@@ -289,9 +293,9 @@ int train() {
      * */
     shared_ptr<caffe::Solver<float>> solver(caffe::SolverRegistry<float>::CreateSolver(solver_param));
 
-    /* 通过GetActionFunction来处理获得的系统信号
-     * 在SetActionFunction中将GetActionFunction函数地址传给参数action_request_function_
-     * 在网络训练的过程中，在GetRequestedAction中来处理action_request_function_得到的函数指针
+    /* GetActionFunction会返回一个回调类对象
+     * 在SetActionFunction中返回的回调类对象传给了solver的action_request_function_成员
+     * 在网络训练的过程中，当回调函数捕获到信号时,就会调用这个回调类对象对信号进行处理
      * */
     solver->SetActionFunction(signal_handler.GetActionFunction());
     /* 判断了一下用户是否定义了snapshot或者weights这两个参数中的一个
@@ -310,7 +314,7 @@ int train() {
         sync.Run(gpus);/*执行解算器(迭代训练/测试)*/
     } else {
         LOG(INFO) << "Starting Optimization";
-        solver->Solve();/*Starting Optimization 执行解算器(迭代训练/测试)*/
+        solver->Solve();/*Starting Optimization 执行解算器(迭代训练/测试)的入口*/
     }
     LOG(INFO) << "Optimization Done.";
     return 0;
@@ -486,7 +490,7 @@ int time() {
 RegisterBrewFunction(time);
 
 int main(int argc, char **argv) {
-    // Print output to stderr (while still logging).
+    // 是否将stderr流输出到log文件中
     FLAGS_alsologtostderr = 1;
     // Set version
     gflags::SetVersionString(AS_STRING(CAFFE_VERSION));
@@ -498,7 +502,7 @@ int main(int argc, char **argv) {
                             "  test            score a model\n"
                             "  device_query    show GPU diagnostic information\n"
                             "  time            benchmark model execution time");
-    // Run tool or show usage.
+    // 初始化日志相关的所有内容
     caffe::GlobalInit(&argc, &argv);
     if (argc == 2) {
 #ifdef WITH_PYTHON_LAYER
