@@ -157,6 +157,8 @@ namespace caffe {
          * then computes and returns the loss.
          *
          * Your layer should implement Forward_cpu and (optionally) Forward_gpu.
+         * 前向传播与反向传播包装器,注意这个只是一个包装器,还需要实现的是forward_cpu&gpu函数,
+         * 如果没有反向运算则可以不实现反向传播函数
          */
         inline Dtype Forward(const vector<Blob<Dtype> *> &bottom,
                              const vector<Blob<Dtype> *> &top);
@@ -181,9 +183,11 @@ namespace caffe {
          * top blob diffs.
          *
          * Your layer should implement Backward_cpu and (optionally) Backward_gpu.
+         * 前向传播与反向传播包装器,注意这个只是一个包装器,还需要实现的是forward_cpu&gpu函数,
+         * 如果没有反向运算则可以不实现反向传播函数
          */
         inline void Backward(const vector<Blob<Dtype> *> &top,
-                             const vector<bool> &propagate_down,
+                             const vector<bool> &propagate_down,/*和bottom的shape大小相同,用于决定bottom哪些需要反传*/
                              const vector<Blob<Dtype> *> &bottom);
 
         /**
@@ -291,7 +295,7 @@ namespace caffe {
          *
          * This method should be overridden to return true if your layer expects an
          * equal number of bottom and top blobs.
-         * 如果你需要一个bottom与top数量相等的layer时必须要重写这个方法
+         * 如果你需要一个bottom与top数量相等的layer时必须要重写这个方法阐明如何判断bottom与top的数量
          */
         virtual inline bool EqualNumBottomTopBlobs() const { return false; }
 
@@ -314,6 +318,7 @@ namespace caffe {
          * If AllowForceBackward(i) == false, we will ignore the force_backward
          * setting and backpropagate to blob i only if it needs gradient information
          * (as is done when force_backward == false).
+         * 当允许强制反传=False时,程序会忽略force_backward函数
          */
         virtual inline bool AllowForceBackward(const int bottom_index) const {
             return true;
@@ -352,7 +357,7 @@ namespace caffe {
         /** The phase: TRAIN or TEST */
         Phase phase_;
         /** The vector that stores the learnable parameters as a set of blobs. */
-        vector<shared_ptr<Blob<Dtype> > > blobs_;
+        vector<shared_ptr<Blob<Dtype> > > blobs_;/*存储各类blobs*/
         /** Vector indicating whether to compute the diff of each param blob. */
         vector<bool> param_propagate_down_;
 
@@ -398,16 +403,17 @@ namespace caffe {
          * Called by the parent Layer's SetUp to check that the number of bottom
          * and top Blobs provided as input match the expected numbers specified by
          * the {ExactNum,Min,Max}{Bottom,Top}Blobs() functions.
+         * 检查blob的数量是否符合要求
          */
         virtual void CheckBlobCounts(const vector<Blob<Dtype> *> &bottom,
                                      const vector<Blob<Dtype> *> &top) {
             if (ExactNumBottomBlobs() >= 0) {
-                CHECK_EQ(ExactNumBottomBlobs(), bottom.size())
+                CHECK_EQ(ExactNumBottomBlobs(), bottom.size())/*检查bottom blob的数量是否符合ExactNumBottomBlos函数中设置的需求*/
                     << type() << " Layer takes " << ExactNumBottomBlobs()
                     << " bottom blob(s) as input.";
             }
             if (MinBottomBlobs() >= 0) {
-                CHECK_LE(MinBottomBlobs(), bottom.size())
+                CHECK_LE(MinBottomBlobs(), bottom.size())/*同上*/
                     << type() << " Layer takes at least " << MinBottomBlobs()
                     << " bottom blob(s) as input.";
             }
@@ -454,8 +460,8 @@ namespace caffe {
                     if (loss_weight == Dtype(0)) { continue; }
                     this->set_loss(top_id, loss_weight);
                     const int count = top[top_id]->count();
-                    Dtype *loss_multiplier = top[top_id]->mutable_cpu_diff();
-                    caffe_set(count, loss_weight, loss_multiplier);
+                    Dtype *loss_multiplier = top[top_id]->mutable_cpu_diff();/*取出存放diff的内存指针*/
+                    caffe_set(count, loss_weight, loss_multiplier);/*将loss_weight复制到loss_multiplier中*/
                 }
             }
         }
@@ -476,28 +482,31 @@ namespace caffe {
         /** Unlock forward_mutex_ if this layer is shared */
         void Unlock();
 
-    DISABLE_COPY_AND_ASSIGN(Layer);
+    DISABLE_COPY_AND_ASSIGN(Layer);/*关闭拷贝和赋值操作符*/
     };  // class Layer
 
-// Forward and backward wrappers. You should implement the cpu and
-// gpu specific implementations instead, and should not change these
-// functions.
+    /* Forward and backward wrappers. You should implement the cpu and
+     * gpu specific implementations instead, and should not change these
+     * functions.
+     * 作者自己写的forward函数,可以作为自己Forward函数的参考,但是不要修改
+     * 同时应该去重写Forward_cpu&gpu函数
+     */
     template<typename Dtype>
     inline Dtype Layer<Dtype>::Forward(const vector<Blob<Dtype> *> &bottom,
                                        const vector<Blob<Dtype> *> &top) {
         // Lock during forward to ensure sequential forward
         Lock();
         Dtype loss = 0;
-        Reshape(bottom, top);
+        Reshape(bottom, top);/*reshape不单会对blob进行reshape,还会负责缓存的分配,注意这里bottom和top的shape之间没什么关系*/
         switch (Caffe::mode()) {
             case Caffe::CPU:
                 Forward_cpu(bottom, top);
                 for (int top_id = 0; top_id < top.size(); ++top_id) {
                     if (!this->loss(top_id)) { continue; }
-                    const int count = top[top_id]->count();
-                    const Dtype *data = top[top_id]->cpu_data();
-                    const Dtype *loss_weights = top[top_id]->cpu_diff();
-                    loss += caffe_cpu_dot(count, data, loss_weights);
+                    const int count = top[top_id]->count();/*计算blob的内存大小*/
+                    const Dtype *data = top[top_id]->cpu_data();/*取出data指针*/
+                    const Dtype *loss_weights = top[top_id]->cpu_diff();/*取出diff指针*/
+                    loss += caffe_cpu_dot(count, data, loss_weights);/*点乘,根据导函数*diff=导数的公式得到本层的diff(即loss)*/
                 }
                 break;
             case Caffe::GPU:

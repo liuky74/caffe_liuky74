@@ -22,6 +22,6 @@ void Layer<Dtype>::Unlock() {
   }
 }
 
-INSTANTIATE_CLASS(Layer);
+INSTANTIATE_CLASS(Layer);/*实例化Layer这个类*/
 
 }  // namespace caffe

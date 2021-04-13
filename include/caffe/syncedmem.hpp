@@ -39,6 +39,7 @@ inline void CaffeFreeHost(void* ptr, bool use_cuda) {
 /**
  * @brief Manages memory allocation and synchronization between the host (CPU)
  *        and device (GPU).
+ * 管理CPU与GPU之间数据的传输,内存分配以及同步的类,自动状态转换机
  *
  * TODO(dox): more thorough description.
  */
@@ -57,9 +58,9 @@ class SyncedMemory {
   void set_cpu_data(void* data);
   const void* gpu_data();
   void set_gpu_data(void* data);
-  void* mutable_cpu_data();
-  void* mutable_gpu_data();
-  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
+  void* mutable_cpu_data();/*最新更新的CPU数据*/
+  void* mutable_gpu_data();/*最新更新的GPU数据*/
+  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };/*状态枚举[未初始化,在CPU上,在GPU上,CPU&GPU同步存在]*/
   SyncedHead head() { return head_; }
   size_t size() { return size_; }
 
