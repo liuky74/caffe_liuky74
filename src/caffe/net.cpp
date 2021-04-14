@@ -66,6 +66,10 @@ namespace caffe {
         // Basically, build all the layers and set up their connections.
         name_ = param.name();
         map<string, int> blob_name_to_idx;
+        /*
+         * 用来保存可用的blob,当某个layer有top blob时,就会加入这个集合,
+         * 因为top blob中的数据作为其他layer的输入(bottom)来使用
+         * */
         set<string> available_blobs;
         memory_used_ = 0;
         // For each layer, set up its input and output
@@ -104,20 +108,26 @@ namespace caffe {
             layer_names_.push_back(layer_param.name());
             LOG_IF(INFO, Caffe::root_solver())
             << "Creating Layer " << layer_param.name();
+            /*新建一个bool类型用于获取当前层是否需要反传,默认是不需要*/
             bool need_backward = false;
 
             // Figure out this layer's input and output
-            /*开始添加bottom信息*/
+            /*开始添加bottom信息,注意比如input_data层是没有bottom的,只有top*/
             for (int bottom_id = 0; bottom_id < layer_param.bottom_size();
                  ++bottom_id) {
                 const int blob_id = AppendBottom(param, layer_id, bottom_id,
                                                  &available_blobs, &blob_name_to_idx);
                 // If a blob needs backward, this layer should provide it.
+                /*判断是否需要反传,需要注意的是这个blob_need_backward_也是Net共用的,
+                 * 比如也许某个blob在第一层时不需要反传,但是第三层的时候需要反传,
+                 * 这时候在init的最后就会将这个blob设置为需要反传,当第5层也需要使用这个blob的时候,
+                 * 下面这行代码取出来的need_backward就会变成True*/
                 need_backward |= blob_need_backward_[blob_id];
             }
             /*添加完bottom后开始添加top*/
             int num_top = layer_param.top_size();
             for (int top_id = 0; top_id < num_top; ++top_id) {
+                /*AppendTop函数就会将当前layer的top放入available_blobs以供其他layer使用*/
                 AppendTop(param, layer_id, top_id, &available_blobs, &blob_name_to_idx);
                 // Collect Input layer tops as Net inputs.
                 /*如果当前层是input层,*/
@@ -127,9 +137,12 @@ namespace caffe {
                     net_input_blobs_.push_back(blobs_[blob_id].get());
                 }
             }
-            // If the layer specifies that AutoTopBlobs() -> true and the LayerParameter
-            // specified fewer than the required number (as specified by
-            // ExactNumTopBlobs() or MinTopBlobs()), allocate them here.
+            /*
+             * If the layer specifies that AutoTopBlobs() -> true and the LayerParameter
+             * specified fewer than the required number (as specified by
+             * ExactNumTopBlobs() or MinTopBlobs()), allocate them here.
+             * 如果启用了自动构建top blob
+             * */
             Layer<Dtype> *layer = layers_[layer_id].get();
             if (layer->AutoTopBlobs()) {
                 const int needed_num_top =
@@ -142,9 +155,11 @@ namespace caffe {
                 }
             }
             // After this layer is connected, set it up.
+            /*当前层的参数已经全部导入并且将当前层连入Net,现在开始调用layer的SetUp函数进行层设置*/
             if (share_from_root) {
+                /*share from root 是SSD新添加的参数,作用尚不明确,看上去是从另一个net复制参数到本层*/
                 // Set up size of top blobs using root_net_
-                const vector<Blob<Dtype> *> &base_top = root_net_->top_vecs_[layer_id];
+                const vector<Blob<Dtype> *> &base_top = root_net_->top_vecs_[layer_id];/*取出root_net下本层的top*/
                 const vector<Blob<Dtype> *> &this_top = this->top_vecs_[layer_id];
                 for (int top_id = 0; top_id < base_top.size(); ++top_id) {
                     this_top[top_id]->ReshapeLike(*base_top[top_id]);
@@ -153,14 +168,25 @@ namespace caffe {
                               << layer_param.name();
                 }
             } else {
+                /*调用层设置函数SetUp,主要包含矩阵初始化,top/bottom数量检测,各个层自定义的设置函数,reshape等操作*/
                 layers_[layer_id]->SetUp(bottom_vecs_[layer_id], top_vecs_[layer_id]);
             }
-            LOG_IF(INFO, Caffe::root_solver())
+            LOG_IF(INFO, Caffe::root_solver())/*打印整个网络结构*/
             << "Setting up " << layer_names_[layer_id];
+            /*
+             * 取出当前层的所有top的blob id,注意for循环中的top_id仅仅是一个临时id,
+             * 而top_id_vecs_[layer_id][top_id]取出的才是在当前Net下真正的top_id
+             * */
             for (int top_id = 0; top_id < top_vecs_[layer_id].size(); ++top_id) {
+                /*如果取出的top_id大于blob_loss_weights_,则对其扩容*/
                 if (blob_loss_weights_.size() <= top_id_vecs_[layer_id][top_id]) {
                     blob_loss_weights_.resize(top_id_vecs_[layer_id][top_id] + 1, Dtype(0));
                 }
+                /*
+                 * 注意top_id_vecs_[layer_id][top_id]返回的是Net下top blob的索引即Net_top_id,
+                 * 而循环中的top_id是取出当前层的一个临时索引,两者不同
+                 * 从layer中取出loss,传入blob_loss_weights_中对应索引中
+                 * */
                 blob_loss_weights_[top_id_vecs_[layer_id][top_id]] = layer->loss(top_id);
                 LOG_IF(INFO, Caffe::root_solver())
                 << "Top shape: " << top_vecs_[layer_id][top_id]->shape_string();
@@ -168,20 +194,33 @@ namespace caffe {
                     LOG_IF(INFO, Caffe::root_solver())
                     << "    with loss weight " << layer->loss(top_id);
                 }
-                memory_used_ += top_vecs_[layer_id][top_id]->count();
+                memory_used_ += top_vecs_[layer_id][top_id]->count();/*统计整个Net用了多少内存*/
             }
+            /*打印内存的使用数量*/
             LOG_IF(INFO, Caffe::root_solver())
             << "Memory required for data: " << memory_used_ * sizeof(Dtype);
+            /*
+             * 最后检测以下参数数量是否对的上
+             * param_size是传入的配置文件中的参数数量
+             * num_param_blobs是生成的Net中实际包含的blob数量
+             * */
             const int param_size = layer_param.param_size();
             const int num_param_blobs = layers_[layer_id]->blobs().size();
             CHECK_LE(param_size, num_param_blobs)
                 << "Too many params specified for layer " << layer_param.name();
+
+            /*申请一个类来存放参数*/
             ParamSpec default_param_spec;
+            /*根据Net中实际的blob数量来取参数,这里的param_id实际是blob_id*/
             for (int param_id = 0; param_id < num_param_blobs; ++param_id) {
+                /*如果当前的blob_id小于param的数量,则取出对应的param,如果超过了param的数量,则指向新建的param_spec*/
                 const ParamSpec *param_spec = (param_id < param_size) ?
                                               &layer_param.param(param_id) : &default_param_spec;
+                /*根据当前层的参数来设置是否需要反传,仍要记得blob是整个Net共用的,
+                 * 如果在某一层下这个blob需要反传,那么所有使用这个blob的层都会将其标记为需要反传*/
                 const bool param_need_backward = param_spec->lr_mult() != 0;
-                need_backward |= param_need_backward;
+                need_backward |= param_need_backward;/*注意Net在init过程中会有多个地方判断是否需要反传*/
+                /*根据参数设置本层*/
                 layers_[layer_id]->set_param_propagate_down(param_id,
                                                             param_need_backward);
             }
@@ -189,16 +228,19 @@ namespace caffe {
                 AppendParam(param, layer_id, param_id);
             }
             // Finally, set the backward flag
+            /*在Net中将本层标记为反传或者不需要反传*/
             layer_need_backward_.push_back(need_backward);
             if (need_backward) {
                 for (int top_id = 0; top_id < top_id_vecs_[layer_id].size(); ++top_id) {
                     blob_need_backward_[top_id_vecs_[layer_id][top_id]] = true;
                 }
             }
-        }
+        }/*至此layer的init就已经完成*/
+
         // Go through the net backwards to determine which blobs contribute to the
         // loss.  We can skip backward computation for blobs that don't contribute
         // to the loss.
+        /*通过跳过不需要反传的层来加速运行速度?*/
         // Also checks if all bottom blobs don't need backward computation (possible
         // because the skip_propagate_down param) and so we can skip bacward
         // computation for the entire layer
@@ -207,28 +249,38 @@ namespace caffe {
         for (int layer_id = layers_.size() - 1; layer_id >= 0; --layer_id) {
             bool layer_contributes_loss = false;
             bool layer_skip_propagate_down = true;
+            /*检查当前layer的每一个top,判断是否要参与反向传播亦或跳过反向传播*/
             for (int top_id = 0; top_id < top_vecs_[layer_id].size(); ++top_id) {
                 const string &blob_name = blob_names_[top_id_vecs_[layer_id][top_id]];
+                /*当前top中包含loss,且在blobs_under_loss中能搞找到当前top的blob_name*/
                 if (layers_[layer_id]->loss(top_id) ||
                     (blobs_under_loss.find(blob_name) != blobs_under_loss.end())) {
-                    layer_contributes_loss = true;
+                    layer_contributes_loss = true;/*有贡献loss*/
                 }
+                /*如果blobs_skip_backp(保存了需要跳过反传的blob)中找到了这个blob*/
                 if (blobs_skip_backp.find(blob_name) == blobs_skip_backp.end()) {
-                    layer_skip_propagate_down = false;
+                    layer_skip_propagate_down = false;/*不可以被跳过*/
                 }
+                /*贡献了loss且不在跳过反传的名单里,则当前layer肯定是要参与反传的*/
                 if (layer_contributes_loss && !layer_skip_propagate_down)
                     break;
             }
-            // If this layer can skip backward computation, also all his bottom blobs
-            // don't need backpropagation
+            /*
+             * If this layer can skip backward computation, also all his bottom blobs
+             * don't need backpropagation
+             * 虽然在layer_need_backward_中本层需要反传,但是本层所有的top blob都在跳过反传的名单中,
+             * 后者的优先级更高,所以要修改layer_need_backward_将本层标记为不需要反传,这个跳过反传的名单应该是手动指定的冻结某层*/
             if (layer_need_backward_[layer_id] && layer_skip_propagate_down) {
                 layer_need_backward_[layer_id] = false;
+                /*同步修改bottom_need_backward_*/
                 for (int bottom_id = 0; bottom_id < bottom_vecs_[layer_id].size();
                      ++bottom_id) {
                     bottom_need_backward_[layer_id][bottom_id] = false;
                 }
             }
+            /*如果本层没有任何blob包含loss,就说明本层也不需要参与反传*/
             if (!layer_contributes_loss) { layer_need_backward_[layer_id] = false; }
+            /*输出是否需要反传的相关信息*/
             if (Caffe::root_solver()) {
                 if (layer_need_backward_[layer_id]) {
                     LOG(INFO) << layer_names_[layer_id] << " needs backward computation.";
@@ -237,12 +289,13 @@ namespace caffe {
                               << " does not need backward computation.";
                 }
             }
+            /*处理完top,我们就可以知道bottom中哪些会包含loss(因为top的loss会反向传递给bottom,bottom会作为下一层的top)*/
             for (int bottom_id = 0; bottom_id < bottom_vecs_[layer_id].size();
                  ++bottom_id) {
                 if (layer_contributes_loss) {
                     const string &blob_name =
                             blob_names_[bottom_id_vecs_[layer_id][bottom_id]];
-                    blobs_under_loss.insert(blob_name);
+                    blobs_under_loss.insert(blob_name);/*标明哪些bottom是需要反传的*/
                 } else {
                     bottom_need_backward_[layer_id][bottom_id] = false;
                 }
@@ -254,6 +307,7 @@ namespace caffe {
             }
         }
         // Handle force_backward if needed.
+        /*强制反传*/
         if (param.force_backward()) {
             for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
                 layer_need_backward_[layer_id] = true;
@@ -273,20 +327,26 @@ namespace caffe {
             }
         }
         // In the end, all remaining blobs are considered output blobs.
+        /*因为layer会在AppendBottom中使用available_blobs中的blobs,所以当最后仍未被使用的blob就是Net的输出了*/
         for (set<string>::iterator it = available_blobs.begin();
              it != available_blobs.end(); ++it) {
             LOG_IF(INFO, Caffe::root_solver())
             << "This network produces output " << *it;
+            /*使用net_output_blobs_数组保存这些输出blob*/
             net_output_blobs_.push_back(blobs_[blob_name_to_idx[*it]].get());
             net_output_blob_indices_.push_back(blob_name_to_idx[*it]);
         }
+        /*将blob和blob_idx映射起来*/
         for (size_t blob_id = 0; blob_id < blob_names_.size(); ++blob_id) {
             blob_names_index_[blob_names_[blob_id]] = blob_id;
         }
+        /*将layer和layer_idx映射起来*/
         for (size_t layer_id = 0; layer_id < layer_names_.size(); ++layer_id) {
             layer_names_index_[layer_names_[layer_id]] = layer_id;
         }
+        /*从参数里面抄权值*/
         ShareWeights();
+        /*设置DEBUG*/
         debug_info_ = param.debug_info();
         LOG_IF(INFO, Caffe::root_solver()) << "Network initialization done.";
     }
@@ -428,6 +488,7 @@ namespace caffe {
             top_id_vecs_[layer_id].push_back(blob_id);
             top_vecs_[layer_id].push_back(blob_pointer.get());
         }
+        /*因为top blob都是layer的输出,因此将blob添加进入可用blobs列表中,可以作为其他layer的输入使用*/
         if (available_blobs) { available_blobs->insert(blob_name); }
     }
 
@@ -564,6 +625,7 @@ namespace caffe {
         Dtype loss = 0;
         for (int i = start; i <= end; ++i) {
             // LOG(ERROR) << "Forwarding " << layer_names_[i];
+            /*按照layer的顺序挨次调用并统计loss*/
             Dtype layer_loss = layers_[i]->Forward(bottom_vecs_[i], top_vecs_[i]);
             loss += layer_loss;
             if (debug_info_) { ForwardDebugInfo(i); }
@@ -583,6 +645,7 @@ namespace caffe {
 
     template<typename Dtype>
     const vector<Blob<Dtype> *> &Net<Dtype>::Forward(Dtype *loss) {
+        /*指挥layer*/
         if (loss != NULL) {
             *loss = ForwardFromTo(0, layers_.size() - 1);
         } else {

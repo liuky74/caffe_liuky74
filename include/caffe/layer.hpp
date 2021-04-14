@@ -54,6 +54,7 @@ namespace caffe {
 
         /**
          * @brief Implements common layer setup functionality.
+         * 设置函数
          *
          * @param bottom the preshaped input blobs
          * @param top

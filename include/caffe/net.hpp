@@ -86,6 +86,7 @@ namespace caffe {
         /**
          * @brief Zeroes out the diffs of all net parameters.
          *        Should be run before Backward.
+         *        清空所有参数的diff,必须在反传前运行,类似pytorch的zero grad
          */
         void ClearParamDiffs();
 
@@ -118,6 +119,7 @@ namespace caffe {
         }
 
         /// @brief Updates the network weights based on the diff values computed.
+        /*更新网络的权重*/
         void Update();
 
         /**
@@ -131,6 +133,7 @@ namespace caffe {
         /**
          * @brief For an already initialized net, implicitly copies (i.e., using no
          *        additional memory) the pre-trained layers from another Net.
+         * 通过内存映射的方式加载预训练模型,避免不必要的内存损耗
          */
         void ShareTrainedLayersWith(const Net *other);
         // For an already initialized net, CopyTrainedLayersFrom() copies the already
@@ -360,9 +363,14 @@ namespace caffe {
         /// top_vecs stores the vectors containing the output for each layer
         vector<vector < Blob < Dtype>*> >
         top_vecs_;
+        /*二维数组,每一个layer下的top_id组成的数组*/
         vector <vector<int>> top_id_vecs_;
-        /// Vector of weight in the loss (or objective) function of each net blob,
-        /// indexed by blob_id.
+        /* Vector of weight in the loss (or objective) function of each net blob,
+         * indexed by blob_id.
+         * blob_loss_weights_ 保存了Net中所有的top blob的loss权重,
+         * 在Net中,所有layer中的blob根据top/bottom都储存在同一套数组下,
+         * 比如layer_1有两个top,分别是top_1和top_2,layer_2有1个top,则在Net中它 是top_3.
+         * */
         vector <Dtype> blob_loss_weights_;
         vector <vector<int>> param_id_vecs_;
         vector<int> param_owners_;
